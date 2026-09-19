@@ -1,22 +1,20 @@
 import { useState } from 'react'
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Copy, Plus, Trash2, Upload } from 'lucide-react'
 import type { Field, Schema } from './fields'
-import { fileToDataUrl } from '../lib/images'
+import { compressToBlob, fileToDataUrl } from '../lib/images'
 import { ICON_KEYS, Icon } from '../lib/icons'
-import { supa } from '../lib/supabase'
+import { api, assetUrl, backendOn } from '../lib/api'
 import { useAuth } from '../store/auth'
 import { uid } from '../lib/utils'
 
 type Obj = Record<string, unknown>
 
-/** Upload to Supabase Storage when connected as owner; otherwise embed a compressed copy in the content. */
+/** Upload to the site's own API when connected as owner; otherwise embed a compressed copy in the content. */
 async function storeImage(file: File, owner: boolean): Promise<string> {
-  if (supa && owner) {
-    const blob = await (await fetch(await fileToDataUrl(file))).blob()
-    const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`
-    const { error } = await supa.storage.from('media').upload(path, blob, { contentType: 'image/jpeg', cacheControl: '31536000' })
-    if (error) throw new Error(`Upload failed: ${error.message}`)
-    return supa.storage.from('media').getPublicUrl(path).data.publicUrl
+  if (backendOn && owner) {
+    const r = await api<{ url: string }>('/api/owner/media', { raw: await compressToBlob(file) })
+    if (!r.data) throw new Error(r.error === 'too_large' ? 'That photo is too large.' : 'Upload failed. Try again.')
+    return r.data.url
   }
   return fileToDataUrl(file)
 }
@@ -40,8 +38,8 @@ function ImageInput({ value, onChange }: { value: string; onChange: (v: string) 
         </label>
         {value && <button className="btn btn-ghost btn-icon !min-h-10 !w-10 self-center" onClick={() => onChange('')} aria-label="Clear image"><Trash2 size={16} /></button>}
       </div>
-      {value && <img src={value} alt="" className="h-24 rounded-lg border-[1.5px] border-line object-cover" />}
-      {value.startsWith('data:') && <p className="text-xs text-muted">Embedded in the content (~{Math.round(value.length / 1024)} KB). Connect the backend to upload to storage instead.</p>}
+      {value && <img src={assetUrl(value)} alt="" className="h-24 rounded-lg border-[1.5px] border-line object-cover" />}
+      {value.startsWith('data:') && <p className="text-xs text-muted">Embedded in the content (~{Math.round(value.length / 1024)} KB). Connect the backend and sign in as owner to upload to the site instead.</p>}
       {err && <p role="alert" className="text-sm font-medium text-accent">{err}</p>}
     </div>
   )

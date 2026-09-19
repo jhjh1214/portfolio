@@ -9,7 +9,7 @@ import { useFx } from '../store/fx'
 import { THEMES } from '../theme/palettes'
 import { Icon } from '../lib/icons'
 import { SECTION_ICON } from './SectionShell'
-import { backendOn } from '../lib/supabase'
+import { backendOn } from '../lib/api'
 import { play } from '../lib/sound'
 
 const item = 'flex min-h-11 cursor-pointer items-center gap-3 rounded-xl px-3 text-[.95rem] data-[selected=true]:bg-ink data-[selected=true]:text-bg'

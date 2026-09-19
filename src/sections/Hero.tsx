@@ -13,7 +13,7 @@ import { fetchUser, type GhUser } from '../lib/github'
 import { levelProgress } from '../lib/level'
 import { prefersReducedMotion, RARITY_COLOR, TONE_VAR } from '../lib/utils'
 import { play } from '../lib/sound'
-import { backendOn } from '../lib/supabase'
+import { assetUrl, backendOn } from '../lib/api'
 
 const Board = lazy(() => import('../three/Board'))
 
@@ -82,7 +82,7 @@ export function Hero() {
               className="relative -mt-14 h-32 w-32 shrink-0 self-start rounded-[22px] border-[3px] border-ink bg-surface p-1 shadow-[0_5px_0_var(--accent)] transition-transform active:translate-y-1 active:shadow-[0_1px_0_var(--accent)] sm:-mt-16 sm:h-36 sm:w-36"
             >
               {imgOk && p.avatar ? (
-                <img src={p.avatar} alt={p.name} onError={() => setImgOk(false)} className="h-full w-full rounded-[16px] object-cover" />
+                <img src={assetUrl(p.avatar)} alt={p.name} onError={() => setImgOk(false)} className="h-full w-full rounded-[16px] object-cover" />
               ) : (
                 <span className="font-display grid h-full w-full place-items-center rounded-[16px] bg-raised text-4xl font-bold">{p.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</span>
               )}

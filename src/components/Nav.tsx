@@ -11,7 +11,7 @@ import { unreadCount } from '../lib/messages'
 import { Icon } from '../lib/icons'
 import { Tip } from './kit'
 import { SECTION_ICON } from './SectionShell'
-import { backendOn } from '../lib/supabase'
+import { backendOn } from '../lib/api'
 import { cx } from '../lib/utils'
 import { play } from '../lib/sound'
 

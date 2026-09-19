@@ -6,13 +6,14 @@ import { HiddenBug, Modal } from '../components/kit'
 import { TilePattern } from '../components/TileWall'
 import { Icon } from '../lib/icons'
 import { cx } from '../lib/utils'
+import { assetUrl } from '../lib/api'
 import { play } from '../lib/sound'
 import type { Photo } from '../types'
 
 const TONES = ['var(--primary)', 'var(--accent)', 'var(--cobalt)', 'var(--sun)']
 
 function Frame({ photo, icon, i, big }: { photo: Photo; icon: string; i: number; big?: boolean }) {
-  if (photo.src) return <img src={photo.src} alt={photo.caption} loading="lazy" className={cx('w-full object-cover', big ? 'max-h-[60vh] rounded-xl' : 'aspect-[4/3]')} />
+  if (photo.src) return <img src={assetUrl(photo.src)} alt={photo.caption} loading="lazy" className={cx('w-full object-cover', big ? 'max-h-[60vh] rounded-xl' : 'aspect-[4/3]')} />
   return (
     <div className={cx('relative grid place-items-center overflow-hidden text-white', big ? 'aspect-[4/3] rounded-xl' : 'aspect-[4/3]')}>
       <TilePattern tone={TONES[i % 4]} kind={i % 4} />

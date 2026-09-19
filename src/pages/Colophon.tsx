@@ -21,7 +21,7 @@ const CREDITS: { group: string; items: [string, string, string][] }[] = [
     ['Motion', 'Animation.', 'https://motion.dev'],
     ['three.js and react-three-fiber', 'The 3D circuit board.', 'https://docs.pmnd.rs/react-three-fiber'],
   ] },
-  { group: 'Data and auth', items: [['Supabase', 'Postgres, passwordless email sign-in and row-level security.', 'https://supabase.com']] },
+  { group: 'Backend', items: [['Hono', 'The small web framework behind the API.', 'https://hono.dev'], ['Cloudflare Workers and D1', 'Free hosting and SQLite database.', 'https://developers.cloudflare.com/workers/']] },
 ]
 
 export default function Colophon() {

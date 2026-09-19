@@ -9,7 +9,8 @@ import { useUI } from '../store/ui'
 import type { Content } from '../types'
 import { ListEditor, ObjectForm } from './Form'
 import * as S from './fields'
-import { supa, backendOn } from '../lib/supabase'
+import QRCode from 'qrcode'
+import { api, backendOn, friendlyError } from '../lib/api'
 import { useInbox, type Message } from '../lib/messages'
 import { levelFromXp } from '../lib/level'
 import { uid, cx } from '../lib/utils'
@@ -23,35 +24,30 @@ function Slot({ char, isActive }: SlotProps) {
   return <div className={cx('grid h-14 w-11 place-items-center rounded-xl border-[1.5px] bg-surface font-display text-2xl font-bold', isActive ? 'border-primary' : 'border-line')}>{char}</div>
 }
 
-/** Second factor. Owner writes and inbox reads are refused by the database until this is passed. */
+/** Second factor. Owner writes and inbox reads are refused by the API until this is passed. */
 function MfaStep() {
   const refresh = useAuth((s) => s.refresh)
-  const [factor, setFactor] = useState<{ id: string; qr?: string; secret?: string } | null>(null)
-  const [enrolled, setEnrolled] = useState<boolean | null>(null)
+  const enrolled = useAuth((s) => s.totpEnrolled)
+  const [setup, setSetup] = useState<{ secret: string; qr: string } | null>(null)
   const [code, setCode] = useState('')
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
+    if (enrolled) return
     void (async () => {
-      const { data } = await supa!.auth.mfa.listFactors()
-      const verified = data?.totp?.[0]
-      if (verified) { setEnrolled(true); setFactor({ id: verified.id }); return }
-      // Discard half-finished enrolments, then start a fresh one.
-      for (const f of data?.all ?? []) if (f.status === 'unverified') await supa!.auth.mfa.unenroll({ factorId: f.id })
-      const en = await supa!.auth.mfa.enroll({ factorType: 'totp', friendlyName: `Portfolio ${new Date().toISOString().slice(0, 10)}` })
-      if (en.error) { setErr(en.error.message); return }
-      setEnrolled(false)
-      setFactor({ id: en.data.id, qr: en.data.totp.qr_code, secret: en.data.totp.secret })
+      const r = await api<{ secret: string; uri: string }>('/api/owner/totp/setup', { method: 'POST', body: {} })
+      if (!r.data) { setErr(r.status === 409 ? 'Two-step verification is already set up. Reload this page and enter your code.' : friendlyError(r.error)); return }
+      setSetup({ secret: r.data.secret, qr: await QRCode.toDataURL(r.data.uri, { margin: 1, width: 240 }) })
     })()
-  }, [])
+  }, [enrolled])
 
   const verify = async (value: string) => {
-    if (!factor || value.length !== 6 || busy) return
+    if (value.length !== 6 || busy) return
     setBusy(true); setErr('')
-    const { error } = await supa!.auth.mfa.challengeAndVerify({ factorId: factor.id, code: value })
+    const r = await api('/api/owner/totp/verify', { method: 'POST', body: { code: value } })
     setBusy(false)
-    if (error) { setErr('That code is not right. Codes change every 30 seconds.'); setCode(''); play('error'); return }
+    if (!r.ok) { setErr(r.error === 'rate_limited' ? 'Too many attempts. Wait five minutes and try again.' : 'That code is not right. Codes change every 30 seconds.'); setCode(''); play('error'); return }
     play('win'); await refresh()
   }
 
@@ -59,16 +55,16 @@ function MfaStep() {
     <div className="card mx-auto mt-10 max-w-md p-7">
       <span className="grid h-12 w-12 place-items-center rounded-xl border-[1.5px] border-ink bg-primary text-on-primary"><ShieldCheck size={24} /></span>
       <h1 className="mt-4 text-3xl font-extrabold">{enrolled ? 'Enter your authenticator code' : 'Set up two-step verification'}</h1>
-      {enrolled === false && factor?.qr && (
+      {!enrolled && setup && (
         <div className="mt-3">
           <p className="text-muted">Scan this with an authenticator app (1Password, Authy, Google Authenticator), then enter the 6-digit code it shows. You only do this once.</p>
-          <img src={factor.qr} alt="Authenticator QR code" className="mx-auto mt-4 h-44 w-44 rounded-xl border-[1.5px] border-line bg-white p-2" />
-          <p className="mt-3 break-all text-center text-xs text-muted">Or enter this key manually: <code className="font-mono">{factor.secret}</code></p>
+          <img src={setup.qr} alt="Authenticator QR code" className="mx-auto mt-4 h-44 w-44 rounded-xl border-[1.5px] border-line bg-white p-2" />
+          <p className="mt-3 break-all text-center text-xs text-muted">Or enter this key manually: <code className="font-mono">{setup.secret}</code></p>
         </div>
       )}
       {enrolled && <p className="mt-2 text-muted">Open your authenticator app and enter the current 6-digit code.</p>}
       <div className="mt-5 flex justify-center">
-        <OTPInput maxLength={6} value={code} onChange={setCode} onComplete={verify} inputMode="numeric" autoComplete="one-time-code" containerClassName="flex gap-2" aria-label="Authenticator code" render={({ slots }) => <>{slots.map((s, i) => <Slot key={i} {...s} />)}</>} />
+        <OTPInput maxLength={6} value={code} onChange={setCode} onComplete={verify} inputMode="numeric" autoComplete="one-time-code" containerClassName="flex gap-2" aria-label="Authenticator code" render={({ slots }) => <>{slots.map((sl, k) => <Slot key={k} {...sl} />)}</>} />
       </div>
       {err && <p role="alert" className="mt-3 text-center text-sm font-medium text-accent">{err}</p>}
     </div>
@@ -100,7 +96,7 @@ function Gate() {
   return null
 }
 
-const when = (iso: string) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+const when = (t: number | string) => new Date(t).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
 
 function Inbox() {
   const { items, loading, load, markRead, remove } = useInbox()
@@ -141,18 +137,18 @@ function Inbox() {
   )
 }
 
-interface Friend { id: string; display_name: string; progress: { xp?: number; eggs?: Record<string, number> } | null; created_at: string }
+interface Friend { id: string; displayName: string; createdAt: number; progress: { xp?: number; eggs?: Record<string, number> } | null }
 function Friends() {
   const [rows, setRows] = useState<Friend[] | null>(null)
-  useEffect(() => { void supa?.from('profiles').select('id, display_name, progress, created_at').order('created_at', { ascending: false }).then(({ data }) => setRows((data ?? []) as Friend[])) }, [])
+  useEffect(() => { void api<{ friends: Friend[] }>('/api/owner/friends').then((r) => setRows(r.data?.friends ?? [])) }, [])
   if (!rows) return <p className="text-muted">Loading friends...</p>
   if (!rows.length) return <p className="card p-8 text-center text-muted">No one has signed in yet.</p>
   return (
     <ul className="card divide-y-[1.5px] divide-line">
       {rows.map((r) => (
         <li key={r.id} className="flex items-center gap-4 px-4 py-3">
-          <span className="grid h-10 w-10 place-items-center rounded-full border-[1.5px] border-ink bg-primary font-display font-bold text-on-primary">{(r.display_name || '?')[0].toUpperCase()}</span>
-          <div className="min-w-0 flex-1"><div className="truncate font-semibold">{r.display_name || 'Unnamed friend'}</div><div className="text-sm text-muted">Joined {new Date(r.created_at).toLocaleDateString()}</div></div>
+          <span className="grid h-10 w-10 place-items-center rounded-full border-[1.5px] border-ink bg-primary font-display font-bold text-on-primary">{(r.displayName || '?')[0].toUpperCase()}</span>
+          <div className="min-w-0 flex-1"><div className="truncate font-semibold">{r.displayName || 'Unnamed friend'}</div><div className="text-sm text-muted">Joined {new Date(r.createdAt).toLocaleDateString()}</div></div>
           <div className="text-right text-sm"><div className="font-semibold">Level {levelFromXp(r.progress?.xp ?? 0)}</div><div className="text-muted">{Object.keys(r.progress?.eggs ?? {}).length} achievements</div></div>
         </li>
       ))}
@@ -168,10 +164,9 @@ function Publish({ c }: { c: Content }) {
   const json = useMemo(() => JSON.stringify(c, null, 2) + '\n', [c])
 
   const publish = async () => {
-    if (!supa) return
     setState({ kind: 'busy' })
-    const { error } = await supa.from('site_content').upsert({ id: 'main', data: c, updated_at: new Date().toISOString() })
-    if (error) { setState({ kind: 'err', text: `Could not publish: ${error.message}` }); play('error'); return }
+    const r = await api('/api/owner/content', { method: 'PUT', body: { data: c } })
+    if (!r.ok) { setState({ kind: 'err', text: r.error === 'mfa_required' || r.status === 401 ? 'Your session expired. Sign in again.' : r.error === 'too_large' ? 'The content is too large to publish. Remove some embedded images.' : 'Could not publish. Try again.' }); play('error'); return }
     setRemote(c); discard(); play('win')
     setState({ kind: 'ok', text: 'Published. Visitors see the new content on their next load.' })
   }
@@ -188,7 +183,7 @@ function Publish({ c }: { c: Content }) {
   }
   return (
     <div className="max-w-xl space-y-5">
-      <div className="card p-4"><b>{dirty ? 'You have unpublished changes.' : 'No unpublished changes.'}</b><p className="mt-1 text-sm text-muted">{backendOn ? 'Publishing saves the content to the database. It is live immediately, with no redeploy.' : 'The backend is not connected, so changes stay in this browser. To ship them, download the JSON and replace src/content/content.json in the repository.'}</p></div>
+      <div className="card p-4"><b>{dirty ? 'You have unpublished changes.' : 'No unpublished changes.'}</b><p className="mt-1 text-sm text-muted">{backendOn ? 'Publishing saves the content to the site database. It is live immediately, with no redeploy.' : 'No backend is connected, so changes stay in this browser. To ship them, download the JSON and replace src/content/content.json in the repository.'}</p></div>
       <div className="flex flex-wrap gap-3">
         {backendOn && <button className="btn" disabled={!owner || !dirty || state.kind === 'busy'} onClick={publish}><Rocket size={18} aria-hidden /> {state.kind === 'busy' ? 'Publishing' : 'Publish changes'}</button>}
         <button className="btn btn-soft" onClick={download}><Download size={18} aria-hidden /> Download JSON</button>

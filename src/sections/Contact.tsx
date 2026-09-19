@@ -9,10 +9,13 @@ import { useAuth } from '../store/auth'
 import { useUI } from '../store/ui'
 import { useProgress } from '../store/progress'
 import { sendMessage } from '../lib/messages'
-import { backendOn } from '../lib/supabase'
+import { backendOn } from '../lib/api'
 import { levelFromXp } from '../lib/level'
 import { LinkIcon } from '../lib/icons'
 import { play } from '../lib/sound'
+
+// zod v4 compiles validators with new Function() by default, which a strict Content-Security-Policy forbids.
+z.config({ jitless: true })
 
 const COUNTRIES: [CountryCode, string][] = [['MY', 'Malaysia (+60)'], ['SG', 'Singapore (+65)'], ['ID', 'Indonesia (+62)'], ['TH', 'Thailand (+66)'], ['CN', 'China (+86)'], ['JP', 'Japan (+81)'], ['AU', 'Australia (+61)'], ['GB', 'United Kingdom (+44)'], ['US', 'United States (+1)']]
 
