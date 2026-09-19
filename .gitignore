@@ -5,3 +5,7 @@ dist
 .env
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+.demo
+.wrangler
+.dev.vars
+.e2e
