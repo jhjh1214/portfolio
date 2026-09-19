@@ -1,7 +1,9 @@
-import { motion } from 'motion/react'
+import { ArrowUpRight } from 'lucide-react'
 import { useC } from '../store/content'
-import { CountUp, RarityBadge, Tilt, SkillIcon } from '../components/ui'
-import { RARITY_COLOR } from '../lib/utils'
+import { CountUp, RarityChip } from '../components/kit'
+import { Icon, TechIcon } from '../lib/icons'
+import { TONE_VAR } from '../lib/utils'
+import { TilePattern } from '../components/TileWall'
 
 export function Showcase() {
   const c = useC()
@@ -10,42 +12,41 @@ export function Showcase() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {award && (
-        <Tilt>
-          <motion.article initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="panel holo relative h-full p-7" style={{ borderColor: RARITY_COLOR[award.rarity] + '99' }}>
-            <div className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 rounded-full opacity-30 blur-3xl" style={{ background: RARITY_COLOR[award.rarity] }} />
-            <RarityBadge rarity={award.rarity} />
-            <div className="mt-6 text-7xl" style={{ animation: 'float 4s ease-in-out infinite' }}>{award.icon}</div>
-            <h3 className="font-display mt-4 text-2xl font-bold sm:text-3xl">{award.title}</h3>
-            <p className="mt-1 text-xs uppercase tracking-widest text-accent">{award.issuer} · {award.date}</p>
-            <p className="mt-4 text-sm leading-relaxed text-muted">{award.description}</p>
-          </motion.article>
-        </Tilt>
+        <article className="relative flex flex-col overflow-hidden rounded-[22px] border-[1.5px] border-ink bg-sun p-7 text-[#1b1b1b] shadow-[0_6px_0_var(--ink)] sm:p-9">
+          <svg className="absolute -right-10 -top-10 h-64 w-64 opacity-20" viewBox="0 0 48 48" aria-hidden>
+            <rect x="8" y="8" width="32" height="32" fill="#1b1b1b" /><rect x="8" y="8" width="32" height="32" fill="#1b1b1b" transform="rotate(45 24 24)" />
+          </svg>
+          <div className="relative flex flex-1 flex-col">
+            <div className="grid h-20 w-20 place-items-center rounded-2xl border-[1.5px] border-[#1b1b1b] bg-[#fff8e6]"><Icon name={award.icon} size={40} /></div>
+            <h3 className="mt-6 text-[2rem] font-extrabold leading-[1.02] sm:text-[2.6rem]">{award.title}</h3>
+            <p className="mt-4 max-w-[52ch] text-base leading-relaxed">{award.description}</p>
+            <div className="mt-auto flex items-center justify-between gap-3 pt-8">
+              <RarityChip rarity={award.rarity} />
+              <span className="text-sm font-semibold">{award.issuer}, {award.date}</span>
+            </div>
+          </div>
+        </article>
       )}
       {proj && (
-        <Tilt>
-          <motion.article initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="panel relative h-full overflow-hidden p-7">
-            <div className="absolute inset-0 opacity-25" style={{ background: `linear-gradient(135deg, ${proj.colorA}, transparent 70%)` }} />
-            <div className="relative">
-              <span className="chip text-secondary">Flagship project</span>
-              <h3 className="font-display mt-4 text-3xl font-bold">{proj.emoji} {proj.title}</h3>
-              <p className="mt-2 text-sm text-muted">{proj.tagline}</p>
-              <div className="mt-6 grid grid-cols-2 gap-3">
-                {proj.highlights.map((h) => (
-                  <div key={h.label} className="rounded-lg border border-white/10 bg-black/25 p-3">
-                    <CountUp to={h.value} className="font-display text-2xl font-bold text-accent" />
-                    <div className="text-[10px] uppercase tracking-widest text-muted">{h.label}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {proj.stack.map((s) => <SkillIcon key={s} icon={s} name={s} size={30} />)}
-              </div>
-              {proj.repo && (
-                <a className="btn btn-primary mt-6" href={`https://github.com/${proj.repo}`} target="_blank" rel="noreferrer">Explore {proj.title}</a>
-              )}
-            </div>
-          </motion.article>
-        </Tilt>
+        <article className="card relative flex flex-col overflow-hidden">
+          <div className="relative h-40 overflow-hidden"><TilePattern tone={TONE_VAR[proj.tone]} kind={2} />
+            <span className="absolute bottom-4 left-5 grid h-14 w-14 place-items-center rounded-xl border-[1.5px] border-ink bg-surface text-ink"><Icon name={proj.icon} size={28} /></span>
+          </div>
+          <div className="flex flex-1 flex-col p-7">
+            <h3 className="text-3xl font-extrabold">{proj.title}</h3>
+            <p className="mt-1 text-muted">{proj.tagline}</p>
+            <dl className="mt-6 grid grid-cols-2 gap-3">
+              {proj.highlights.map((h) => (
+                <div key={h.label} className="card-raised p-3">
+                  <dd className="font-display text-3xl font-extrabold"><CountUp to={h.value} /></dd>
+                  <dt className="text-sm text-muted">{h.label}</dt>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-6 flex flex-wrap gap-3 text-muted">{proj.stack.map((s) => <TechIcon key={s} name={s} size={26} />)}</div>
+            {proj.repo && <a className="btn mt-auto w-fit" style={{ marginTop: '1.5rem' }} href={`https://github.com/${proj.repo}`} target="_blank" rel="noreferrer">View the source <ArrowUpRight size={18} aria-hidden /></a>}
+          </div>
+        </article>
       )}
     </div>
   )

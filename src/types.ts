@@ -1,25 +1,13 @@
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
-export type SectionId =
-  | 'showcase'
-  | 'projects'
-  | 'journey'
-  | 'achievements'
-  | 'opensource'
-  | 'skills'
-  | 'album'
-  | 'arcade'
+export type SectionId = 'showcase' | 'projects' | 'journey' | 'achievements' | 'opensource' | 'skills' | 'album' | 'arcade' | 'contact'
 export type GameId = 'bugsquash' | 'tictactoe' | 'memory' | 'snake'
 export type ProjectStatus = 'live' | 'shipped' | 'wip' | 'archived'
+export type ThemeId = 'nyonya' | 'steam' | 'terminal' | 'sakura' | 'mono'
+export type Mode = 'system' | 'light' | 'dark'
+export type Tone = 'teal' | 'coral' | 'sun' | 'cobalt'
 
-export interface LinkItem {
-  label: string
-  url: string
-  icon: string
-}
-export interface Stat {
-  label: string
-  value: string
-}
+export interface LinkItem { label: string; url: string; icon: string }
+export interface Stat { label: string; value: string }
 
 export interface Profile {
   name: string
@@ -28,7 +16,7 @@ export interface Profile {
   bio: string
   avatar: string
   location: string
-  status: string
+  status: 'online' | 'away' | 'offline'
   statusText: string
   typing: string[]
   links: LinkItem[]
@@ -36,26 +24,14 @@ export interface Profile {
   mission: string[]
 }
 
-export interface Theme {
-  bg: string
-  surface: string
-  primary: string
-  secondary: string
-  accent: string
-  text: string
-  muted: string
-  font: 'mono' | 'sans'
+export interface ThemeConfig {
+  defaultTheme: ThemeId
+  defaultMode: Mode
+  offered: ThemeId[]
   hero3d: boolean
-  particles: boolean
 }
 
-export interface SectionConfig {
-  id: SectionId
-  label: string
-  title: string
-  subtitle: string
-  visible: boolean
-}
+export interface SectionConfig { id: SectionId; label: string; title: string; subtitle: string; visible: boolean }
 
 export interface Project {
   id: string
@@ -68,9 +44,8 @@ export interface Project {
   stack: string[]
   repo: string
   url: string
-  colorA: string
-  colorB: string
-  emoji: string
+  tone: Tone
+  icon: string
   featured: boolean
   highlights: Stat[]
 }
@@ -95,45 +70,18 @@ export interface Achievement {
   featured: boolean
 }
 
-export interface OpenSourceItem {
-  id: string
-  name: string
-  repo: string
-  status: string
-  description: string
-  url: string
-}
-
-export interface Skill {
-  name: string
-  icon: string
-  level: number
-}
-export interface SkillGroup {
-  id: string
-  title: string
-  skills: Skill[]
-}
-
-export interface Photo {
-  src: string
-  caption: string
-}
-export interface Album {
-  id: string
-  title: string
-  date: string
-  location: string
-  description: string
-  emoji: string
-  photos: Photo[]
-}
+export interface OpenSourceItem { id: string; name: string; repo: string; status: string; description: string; url: string }
+export interface Skill { name: string; icon: string; level: number }
+export interface SkillGroup { id: string; title: string; skills: Skill[] }
+export interface Photo { src: string; caption: string }
+export interface Album { id: string; title: string; date: string; location: string; description: string; icon: string; photos: Photo[] }
 
 export interface EggDef {
   id: string
   title: string
   description: string
   hint: string
+  touch: string
   icon: string
   rarity: Rarity
   xp: number
@@ -141,17 +89,15 @@ export interface EggDef {
 
 export interface Site {
   githubUser: string
-  publishRepo: string
-  publishBranch: string
-  publishPath: string
   bugCount: number
   arcadeIntro: string
   games: GameId[]
+  contactIntro: string
 }
 
 export interface Content {
   profile: Profile
-  theme: Theme
+  theme: ThemeConfig
   sections: SectionConfig[]
   projects: Project[]
   journey: JourneyItem[]

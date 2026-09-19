@@ -1,35 +1,67 @@
-let ctx: AudioContext | null = null
-function tone(freq: number, start: number, dur: number, vol = 0.05, type: OscillatorType = 'sine') {
-  if (!ctx) return
-  const o = ctx.createOscillator()
-  const g = ctx.createGain()
-  o.type = type
-  o.frequency.value = freq
-  g.gain.setValueAtTime(0, ctx.currentTime + start)
-  g.gain.linearRampToValueAtTime(vol, ctx.currentTime + start + 0.01)
-  g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + start + dur)
-  o.connect(g).connect(ctx.destination)
-  o.start(ctx.currentTime + start)
-  o.stop(ctx.currentTime + start + dur + 0.05)
-}
-function ready(): boolean {
-  try {
-    ctx ??= new AudioContext()
-    if (ctx.state === 'suspended') void ctx.resume()
-    return true
-  } catch {
-    return false
-  }
-}
+import { Howl, Howler } from 'howler'
+
+/**
+ * UI sound effects: Kenney "Interface Sounds" (CC0), served from /sfx and played through Howler.
+ * Sounds load lazily on first use so they cost nothing until someone interacts.
+ */
+const FILES = {
+  click: ['click_003', 0.5],
+  tick: ['tick_001', 0.25],
+  select: ['select_007', 0.5],
+  open: ['open_001', 0.45],
+  close: ['close_001', 0.4],
+  toggle: ['toggle_002', 0.5],
+  flip: ['glass_002', 0.55],
+  chime: ['confirmation_004', 0.55],
+  win: ['confirmation_001', 0.5],
+  error: ['error_004', 0.4],
+  hit: ['drop_001', 0.55],
+  glitch: ['glitch_002', 0.5],
+  bong: ['bong_001', 0.5],
+  whoosh: ['maximize_003', 0.4],
+  pluck: ['pluck_001', 0.5],
+  ask: ['question_002', 0.4],
+} as const
+export type SfxName = keyof typeof FILES
+
+const cache = new Map<SfxName, Howl>()
 let muted = false
-export const setMuted = (m: boolean) => { muted = m }
-const play = (fn: () => void) => { if (!muted && ready()) fn() }
+let last = 0
+
+const base = () => import.meta.env.BASE_URL.replace(/\/$/, '') || '.'
+
+function get(name: SfxName) {
+  let h = cache.get(name)
+  if (!h) {
+    const [file, volume] = FILES[name]
+    h = new Howl({ src: [`${base()}/sfx/${file}.wav`], volume, preload: true, html5: false })
+    cache.set(name, h)
+  }
+  return h
+}
+
+export const setMuted = (m: boolean) => {
+  muted = m
+  Howler.mute(m)
+}
+export const isMuted = () => muted
+
+/** Play a named effect. Rate-limited so rapid taps don't stack into noise. */
+export function play(name: SfxName, opts: { rate?: number } = {}) {
+  if (muted) return
+  const now = performance.now()
+  if (name === 'tick' && now - last < 70) return
+  last = now
+  const h = get(name)
+  if (opts.rate) h.rate(opts.rate)
+  else h.rate(1)
+  h.play()
+}
 
 export const sfx = {
-  /** Steam-ish achievement chime. */
-  unlock: () => play(() => { tone(660, 0, 0.18); tone(880, 0.1, 0.18); tone(1320, 0.2, 0.4, 0.04) }),
-  blip: () => play(() => tone(520, 0, 0.08, 0.04, 'square')),
-  hit: () => play(() => { tone(300, 0, 0.09, 0.05, 'square'); tone(180, 0.05, 0.1, 0.04, 'square') }),
-  bad: () => play(() => tone(120, 0, 0.25, 0.06, 'sawtooth')),
-  win: () => play(() => { tone(523, 0, 0.12); tone(659, 0.1, 0.12); tone(784, 0.2, 0.25) }),
+  unlock: () => play('chime'),
+  blip: () => play('click'),
+  hit: () => play('hit'),
+  bad: () => play('error'),
+  win: () => play('win'),
 }

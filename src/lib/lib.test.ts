@@ -95,7 +95,7 @@ describe('bundled content', () => {
       const ids = list.map((x) => x.id)
       expect(new Set(ids).size).toBe(ids.length)
     }
-    const known = ['showcase', 'projects', 'journey', 'achievements', 'opensource', 'skills', 'album', 'arcade']
+    const known = ['showcase', 'projects', 'journey', 'achievements', 'opensource', 'skills', 'album', 'arcade', 'contact']
     c.sections.forEach((s) => expect(known).toContain(s.id))
   })
   it('survives normalization against itself unchanged', () => {

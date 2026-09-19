@@ -1,48 +1,60 @@
-import { useRef } from 'react'
-import { motion, useScroll, useSpring, useTransform } from 'motion/react'
+import { motion } from 'motion/react'
+import { ArrowRight } from 'lucide-react'
 import { useC } from '../store/content'
-import { HiddenBug } from '../components/ui'
+import { Icon } from '../lib/icons'
+import { HiddenBug } from '../components/kit'
 
-const KIND_COLOR = { start: '#22c55e', project: '#8b5cf6', award: '#f59e0b', oss: '#06b6d4', milestone: '#ec4899' } as const
+const KIND: Record<string, { label: string; color: string }> = {
+  start: { label: 'Started', color: 'var(--primary)' },
+  project: { label: 'Project', color: 'var(--cobalt)' },
+  award: { label: 'Award', color: 'var(--sun)' },
+  oss: { label: 'Open source', color: 'var(--accent)' },
+  milestone: { label: 'Milestone', color: 'var(--primary)' },
+}
 
+/** Steam-style activity feed. The one place a real sequence lives, so it gets a spine. */
 export function Journey() {
   const c = useC()
-  const ref = useRef<HTMLDivElement>(null)
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 70%', 'end 60%'] })
-  const p = useSpring(scrollYProgress, { stiffness: 90, damping: 22 })
-  const top = useTransform(p, [0, 1], ['0%', '100%'])
-
   return (
-    <div ref={ref} className="relative mx-auto max-w-4xl">
-      <HiddenBug id="b3" className="right-0 top-1/3" />
-      <div className="absolute bottom-0 left-4 top-0 w-px bg-white/10 md:left-1/2" />
-      <motion.div className="bg-grad absolute left-4 top-0 w-[2px] origin-top md:left-1/2" style={{ scaleY: p, height: '100%' }} />
-      <motion.div className="absolute left-4 z-10 -translate-x-1/2 text-xl md:left-1/2" style={{ top }} aria-hidden>🐛</motion.div>
-
-      <ol className="space-y-10">
-        {c.journey.map((j, i) => {
-          const left = i % 2 === 0
-          const col = KIND_COLOR[j.kind]
+    <div className="relative grid gap-8 lg:grid-cols-[1fr_20rem]">
+      <HiddenBug id="b3" className="-top-14 right-0" />
+      <ol className="relative max-w-3xl">
+        <span className="absolute bottom-6 left-[1.35rem] top-6 w-[3px] rounded bg-line" aria-hidden />
+        {c.journey.map((j) => {
+          const k = KIND[j.kind] ?? KIND.milestone
           return (
-            <li key={j.id} className="relative pl-12 md:grid md:grid-cols-2 md:gap-12 md:pl-0">
-              <motion.div
-                initial={{ opacity: 0, x: left ? -40 : 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.55 }}
-                className={`panel panel-hover p-5 ${left ? 'md:col-start-1 md:text-right' : 'md:col-start-2'}`}
+            <li key={j.id} className="relative flex gap-4 pb-6 last:pb-0">
+              <motion.span
+                initial={{ scale: 0.6 }} whileInView={{ scale: 1 }} viewport={{ once: true, margin: '-30px' }}
+                transition={{ type: 'spring', stiffness: 400, damping: 18 }}
+                className="relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-full border-[1.5px] border-ink bg-surface"
+                style={{ boxShadow: `0 3px 0 ${k.color}` }}
               >
-                <span className="chip" style={{ color: col }}>{j.date}</span>
-                <h3 className="font-display mt-2 text-lg font-bold">{j.title}</h3>
-                <p className="mt-1 text-sm text-muted">{j.detail}</p>
-              </motion.div>
-              <div className="absolute left-4 top-5 z-[5] grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full border-2 bg-bg text-lg md:left-1/2" style={{ borderColor: col, boxShadow: `0 0 18px -2px ${col}` }}>
-                {j.icon}
+                <Icon name={j.icon} size={20} />
+              </motion.span>
+              <div className="card min-w-0 flex-1 p-4">
+                <div className="flex flex-wrap items-center gap-2 text-sm">
+                  <span className="font-semibold text-muted">{j.date}</span>
+                  <span className="chip" style={{ borderColor: k.color }}>{k.label}</span>
+                </div>
+                <h3 className="mt-1.5 text-xl font-bold">{j.title}</h3>
+                <p className="mt-1 text-muted">{j.detail}</p>
               </div>
             </li>
           )
         })}
       </ol>
+      <aside className="lg:sticky lg:top-24 lg:self-start">
+        <section className="card p-5" aria-label="What's next">
+          <h3 className="text-xl font-bold">What's next</h3>
+          <ul className="mt-3 space-y-2.5">
+            {c.profile.mission.map((m) => (
+              <li key={m} className="flex gap-2.5"><ArrowRight size={18} className="mt-0.5 shrink-0 text-accent" aria-hidden />{m}</li>
+            ))}
+          </ul>
+          <button className="btn btn-soft btn-sm mt-5" onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}>Work with me</button>
+        </section>
+      </aside>
     </div>
   )
 }

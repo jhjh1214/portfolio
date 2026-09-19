@@ -1,79 +1,45 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
-import { ExternalLink, Search, Star, X } from 'lucide-react'
-import { Github } from '../components/BrandIcons'
+import { ArrowUpRight, Search, Star } from 'lucide-react'
 import { useC } from '../store/content'
-import { Tilt, SkillIcon, useLockScroll, HiddenBug } from '../components/ui'
+import { useProgress } from '../store/progress'
+import { useFx } from '../store/fx'
+import { Modal, HiddenBug } from '../components/kit'
+import { TilePattern } from '../components/TileWall'
+import { Icon, TechIcon } from '../lib/icons'
 import { fetchRepos, type GhRepo } from '../lib/github'
+import { cx, TONE_VAR } from '../lib/utils'
+import { play } from '../lib/sound'
 import type { Project } from '../types'
-import { cx } from '../lib/utils'
 
-const STATUS: Record<Project['status'], { label: string; color: string }> = {
-  live: { label: 'Live', color: '#22c55e' },
-  shipped: { label: 'Shipped', color: '#38bdf8' },
-  wip: { label: 'In development', color: '#f59e0b' },
-  archived: { label: 'Archived', color: '#94a3b8' },
+const STATUS: Record<Project['status'], { label: string; dot: string }> = {
+  live: { label: 'Live', dot: '#2fbf71' },
+  shipped: { label: 'Shipped', dot: '#3b82d6' },
+  wip: { label: 'In development', dot: '#e8a020' },
+  archived: { label: 'Archived', dot: '#8a96a3' },
 }
 
-function Cover({ p, big }: { p: Project; big?: boolean }) {
+function Cover({ p, height = 'h-36' }: { p: Project; height?: string }) {
+  const s = STATUS[p.status]
   return (
-    <div className={cx('relative overflow-hidden', big ? 'h-44' : 'h-32')} style={{ background: `linear-gradient(135deg, ${p.colorA}, ${p.colorB})` }}>
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '14px 14px' }} />
-      <div className="absolute inset-0 grid place-items-center" style={{ fontSize: big ? 72 : 52, filter: 'drop-shadow(0 6px 14px rgb(0 0 0 / .5))' }}>{p.emoji}</div>
-      <span className="chip absolute left-3 top-3 bg-black/40" style={{ color: STATUS[p.status].color }}>{STATUS[p.status].label}</span>
-      <span className="absolute bottom-2 right-3 text-[10px] font-bold text-white/70">{p.year}</span>
+    <div className={cx('relative overflow-hidden', height)}>
+      <TilePattern tone={TONE_VAR[p.tone]} kind={p.id.length % 4} />
+      <span className="absolute bottom-3 left-4 grid h-12 w-12 place-items-center rounded-xl border-[1.5px] border-ink bg-surface text-ink"><Icon name={p.icon} size={24} /></span>
+      <span className="chip absolute right-3 top-3 bg-surface"><span className="h-2 w-2 rounded-full" style={{ background: s.dot }} aria-hidden />{s.label}</span>
     </div>
-  )
-}
-
-function Modal({ p, gh, onClose }: { p: Project; gh?: GhRepo; onClose: () => void }) {
-  useLockScroll(true)
-  useEffect(() => {
-    const k = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    addEventListener('keydown', k)
-    return () => removeEventListener('keydown', k)
-  }, [onClose])
-  return (
-    <motion.div className="fixed inset-0 z-[85] grid place-items-center bg-black/70 p-4 backdrop-blur-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
-      <motion.div role="dialog" aria-modal="true" aria-label={p.title} layoutId={`proj-${p.id}`} className="panel max-h-[90vh] w-full max-w-2xl overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <Cover p={p} big />
-        <button className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/50 hover:bg-black/80" onClick={onClose} aria-label="Close"><X size={16} /></button>
-        <div className="p-6">
-          <h3 className="font-display text-3xl font-bold">{p.title}</h3>
-          <p className="mt-1 text-sm text-accent">{p.tagline}</p>
-          <p className="mt-4 text-sm leading-relaxed text-muted">{p.description}</p>
-          {p.highlights.length > 0 && (
-            <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {p.highlights.map((h) => (
-                <div key={h.label} className="rounded-lg bg-white/[.04] p-3 text-center">
-                  <div className="font-display text-lg font-bold text-accent">{h.value}</div>
-                  <div className="text-[10px] uppercase tracking-widest text-muted">{h.label}</div>
-                </div>
-              ))}
-            </div>
-          )}
-          <div className="mt-5 flex flex-wrap gap-2">{p.stack.map((s) => <SkillIcon key={s} icon={s} name={s} size={32} />)}</div>
-          <div className="mt-5 flex flex-wrap items-center gap-2">
-            {p.tags.map((t) => <span key={t} className="chip text-primary">{t}</span>)}
-            {gh && <span className="chip text-amber-400"><Star size={11} /> {gh.stargazers_count}</span>}
-            {gh && <span className="chip text-muted">Updated {new Date(gh.pushed_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>}
-          </div>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {p.repo && <a className="btn btn-primary" href={`https://github.com/${p.repo}`} target="_blank" rel="noreferrer"><Github size={14} /> Source</a>}
-            {p.url && <a className="btn btn-ghost" href={p.url} target="_blank" rel="noreferrer"><ExternalLink size={14} /> Visit</a>}
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
   )
 }
 
 export function Projects() {
   const c = useC()
+  const unlock = useProgress((s) => s.unlock)
+  const fx = useFx((s) => s.play)
   const [q, setQ] = useState('')
   const [tag, setTag] = useState('All')
   const [open, setOpen] = useState<string | null>(null)
   const [repos, setRepos] = useState<GhRepo[]>([])
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const longPressed = useRef(false)
   useEffect(() => { void fetchRepos(c.site.githubUser).then((r) => setRepos(r ?? [])) }, [c.site.githubUser])
 
   const tags = useMemo(() => ['All', ...Array.from(new Set(c.projects.flatMap((p) => p.tags)))], [c.projects])
@@ -81,40 +47,79 @@ export function Projects() {
   const active = c.projects.find((p) => p.id === open)
   const ghFor = (p: Project) => repos.find((r) => r.full_name.toLowerCase() === p.repo.toLowerCase())
 
+  // Press and hold the BanjirKawan card: the touch-friendly way to summon the flood.
+  const startPress = (p: Project) => {
+    longPressed.current = false
+    if (p.id !== 'banjirkawan') return
+    pressTimer.current = setTimeout(() => { longPressed.current = true; unlock('flood'); fx('flood', 5500); play('whoosh') }, 650)
+  }
+  const endPress = () => clearTimeout(pressTimer.current)
+
   return (
     <div className="relative">
-      <HiddenBug id="b2" className="-top-6 right-2" />
+      <HiddenBug id="b2" className="-top-14 right-0" />
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <label className="panel flex items-center gap-2 px-3 py-2 text-xs">
-          <Search size={14} className="text-muted" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search library…" aria-label="Search projects" className="w-40 bg-transparent outline-none placeholder:text-muted" />
+        <label className="relative">
+          <span className="sr-only">Search games</span>
+          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" aria-hidden />
+          <input className="field !w-56 !pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search the library" />
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0" role="group" aria-label="Filter by tag" style={{ scrollbarWidth: "none" }}>
           {tags.map((t) => (
-            <button key={t} onClick={() => setTag(t)} className={cx('chip cursor-pointer transition-colors', tag === t ? 'text-accent' : 'text-muted hover:text-ink')}>{t}</button>
+            <button key={t} aria-pressed={tag === t} onClick={() => { setTag(t); play('tick') }} className={cx('chip !min-h-9 shrink-0 !px-3 !text-sm transition-colors', tag === t && 'chip-solid')}>{t}</button>
           ))}
         </div>
       </div>
-      <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+
+      <motion.ul layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
-          {shown.map((p, i) => (
-            <motion.div key={p.id} layout initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: '-40px' }} exit={{ opacity: 0, scale: 0.9 }} transition={{ delay: (i % 3) * 0.07 }}>
-              <Tilt max={6}>
-                <motion.button layoutId={`proj-${p.id}`} onClick={() => setOpen(p.id)} className="panel panel-hover block w-full overflow-hidden text-left" aria-label={`Open ${p.title}`}>
-                  <Cover p={p} />
-                  <div className="p-4">
-                    <h3 className="font-display text-lg font-bold">{p.title}</h3>
-                    <p className="mt-1 line-clamp-2 min-h-[2.4rem] text-xs text-muted">{p.tagline}</p>
-                    <div className="mt-3 flex flex-wrap gap-2">{p.stack.slice(0, 6).map((s) => <SkillIcon key={s} icon={s} name={s} size={20} />)}</div>
-                  </div>
-                </motion.button>
-              </Tilt>
-            </motion.div>
+          {shown.map((p) => (
+            <motion.li key={p.id} layout initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.2 }}>
+              <button
+                onClick={() => { if (longPressed.current) { longPressed.current = false; return } play('select'); setOpen(p.id) }}
+                onPointerDown={() => startPress(p)} onPointerUp={endPress} onPointerLeave={endPress} onPointerCancel={endPress}
+                onContextMenu={(e) => { if (p.id === 'banjirkawan') e.preventDefault() }}
+                className="card lift block w-full select-none overflow-hidden text-left [-webkit-touch-callout:none]"
+                aria-label={`Open ${p.title}`}
+              >
+                <Cover p={p} />
+                <div className="p-4">
+                  <h3 className="text-xl font-bold">{p.title}</h3>
+                  <p className="mt-1 line-clamp-2 min-h-[2.9rem] text-[.95rem] text-muted">{p.tagline}</p>
+                  <div className="mt-3 flex min-h-6 flex-wrap gap-2.5 text-muted">{p.stack.slice(0, 6).map((s) => <TechIcon key={s} name={s} size={20} />)}</div>
+                </div>
+              </button>
+            </motion.li>
           ))}
         </AnimatePresence>
-      </motion.div>
-      {shown.length === 0 && <p className="py-10 text-center text-sm text-muted">No games match. (¬_¬)</p>}
-      <AnimatePresence>{active && <Modal key={active.id} p={active} gh={ghFor(active)} onClose={() => setOpen(null)} />}</AnimatePresence>
+      </motion.ul>
+      {shown.length === 0 && <p className="py-12 text-center text-muted">Nothing in the library matches "{q}". Clear the search or pick another tag.</p>}
+
+      <Modal open={!!active} onOpenChange={(o) => !o && setOpen(null)} title={active?.title ?? ''} description={active?.tagline} wide>
+        {active && (
+          <div>
+            <div className="-mx-6 -mt-2 mb-5 overflow-hidden md:rounded-xl"><Cover p={active} height="h-32" /></div>
+            <p className="prose-tight leading-relaxed">{active.description}</p>
+            {active.highlights.length > 0 && (
+              <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {active.highlights.map((h) => (
+                  <div key={h.label} className="card-raised p-3"><dd className="font-display text-xl font-extrabold">{h.value}</dd><dt className="text-xs text-muted">{h.label}</dt></div>
+                ))}
+              </dl>
+            )}
+            <div className="mt-5 flex flex-wrap gap-3 text-muted">{active.stack.map((s) => <TechIcon key={s} name={s} size={28} />)}</div>
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              {active.tags.map((t) => <span key={t} className="chip">{t}</span>)}
+              {ghFor(active) && <span className="chip"><Star size={12} aria-hidden /> {ghFor(active)!.stargazers_count}</span>}
+              {ghFor(active) && <span className="chip">Updated {new Date(ghFor(active)!.pushed_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}</span>}
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {active.repo && <a className="btn" href={`https://github.com/${active.repo}`} target="_blank" rel="noreferrer"><TechIcon name="github" size={18} /> Source code</a>}
+              {active.url && <a className="btn btn-soft" href={active.url} target="_blank" rel="noreferrer">Visit <ArrowUpRight size={18} aria-hidden /></a>}
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
