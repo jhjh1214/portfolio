@@ -1,0 +1,328 @@
+{
+  "profile": {
+    "name": "Lim Jun Hong",
+    "handle": "jhjh1214",
+    "tagline": "Engineering systems that actually ship.",
+    "bio": "Software engineer, system builder and open source contributor. Hardware → IoT → backend → mobile → AI. 🐛 (╯°□°）╯︵ ┻━┻",
+    "avatar": "https://avatars.githubusercontent.com/u/220684802?v=4",
+    "location": "Malacca, Malaysia",
+    "status": "online",
+    "statusText": "Online — building",
+    "typing": [
+      "Engineering systems that actually ship.",
+      "Hardware → IoT → Backend → Mobile → AI",
+      "Blockchain | AI/LLM | IoT | Full-stack",
+      "Building products, not just projects."
+    ],
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/jhjh1214", "icon": "github" },
+      { "label": "LinkedIn", "url": "https://www.linkedin.com/in/lim-jun-hong-346857366/", "icon": "linkedin" },
+      { "label": "Email", "url": "mailto:yyingdorothy@gmail.com", "icon": "mail" }
+    ],
+    "spoken": [
+      { "language": "中文", "level": "Native" },
+      { "language": "English", "level": "Professional fluent" },
+      { "language": "Bahasa Melayu", "level": "Fluent" }
+    ],
+    "mission": [
+      "Build systems that survive real usage",
+      "Turn AI into practical engineering",
+      "Keep learning at system level",
+      "Keep shipping"
+    ]
+  },
+  "theme": {
+    "bg": "#050816",
+    "surface": "#0b1026",
+    "primary": "#8b5cf6",
+    "secondary": "#db2777",
+    "accent": "#67e8f9",
+    "text": "#e2e8f0",
+    "muted": "#94a3b8",
+    "font": "mono",
+    "hero3d": true,
+    "particles": true
+  },
+  "sections": [
+    { "id": "showcase", "label": "Showcase", "title": "Rare Achievement", "subtitle": "The one on the top shelf.", "visible": true },
+    { "id": "projects", "label": "Library", "title": "Game Library", "subtitle": "Everything I've built. Click a cover to open its store page.", "visible": true },
+    { "id": "journey", "label": "Quest Log", "title": "The Journey", "subtitle": "From first Angular tutorial to blockchain, IoT and real clients.", "visible": true },
+    { "id": "achievements", "label": "Achievements", "title": "Achievements", "subtitle": "Earned awards, plus a few hidden ones only explorers find.", "visible": true },
+    { "id": "opensource", "label": "Workshop", "title": "Open Source", "subtitle": "Contributing to software beyond personal repositories.", "visible": true },
+    { "id": "skills", "label": "Loadout", "title": "Engineering Arsenal", "subtitle": "Tools I reach for.", "visible": true },
+    { "id": "album", "label": "Screenshots", "title": "Album", "subtitle": "Events, trips and moments, by chapter.", "visible": true },
+    { "id": "arcade", "label": "Arcade", "title": "Arcade", "subtitle": "Take a break. Beat my scores. XP is real.", "visible": true }
+  ],
+  "projects": [
+    {
+      "id": "vehiclechain",
+      "title": "VehicleChain",
+      "tagline": "Blockchain vehicle service, warranty and dispute platform.",
+      "description": "Blockchain-backed vehicle service and warranty management platform for the Malaysian automotive market: tamper-proof service records, multi-party on-chain verification, real-time push notifications, and independently verifiable warranty status.",
+      "status": "shipped",
+      "year": "2026",
+      "tags": ["Blockchain", "Full-stack", "Award"],
+      "stack": ["solidity", "python", "flask", "postgres", "angular", "flutter", "firebase", "docker"],
+      "repo": "jhjh1214/blockchain-vehicle-service",
+      "url": "",
+      "colorA": "#8b5cf6",
+      "colorB": "#312e81",
+      "emoji": "⛓️",
+      "featured": true,
+      "highlights": [
+        { "label": "Smart contracts", "value": "3" },
+        { "label": "Automated tests", "value": "702" },
+        { "label": "Security vectors", "value": "38" },
+        { "label": "High/Critical (Slither)", "value": "0" }
+      ]
+    },
+    {
+      "id": "milansoftware",
+      "title": "MilanSoftware",
+      "tagline": "Quotation platform built for a real business workflow.",
+      "description": "Soft furnishings order system for a Malaysian retailer (MilanDecor): a Flutter quoting app, a FastAPI backend and one shared pricing contract. Next up: floor plan recognition, AI workflows and LLM integration.",
+      "status": "wip",
+      "year": "2026",
+      "tags": ["Client", "Mobile", "AI"],
+      "stack": ["flutter", "dart", "typescript", "react", "nodejs", "python", "fastapi", "postgres", "docker"],
+      "repo": "",
+      "url": "",
+      "colorA": "#0ea5e9",
+      "colorB": "#1e293b",
+      "emoji": "🛋️",
+      "featured": false,
+      "highlights": [
+        { "label": "Client", "value": "MilanDecor" },
+        { "label": "Flow", "value": "App → API → Dashboard" }
+      ]
+    },
+    {
+      "id": "smart-inventory",
+      "title": "Smart Inventory",
+      "tagline": "RFID + IoT supply-chain tracker with an LLM assistant.",
+      "description": "AI-driven, LLM-based assistant smart inventory management system. ESP32 / RC522 readers publish over MQTT to a Flask backend with a tag state machine, a live SSE dashboard, and ML-backed analytics.",
+      "status": "shipped",
+      "year": "2026",
+      "tags": ["IoT", "AI", "Hardware", "Award"],
+      "stack": ["python", "flask", "sqlite", "🔌"],
+      "repo": "jhjh1214/smart-inventory-rfid-iot",
+      "url": "",
+      "colorA": "#06b6d4",
+      "colorB": "#0f172a",
+      "emoji": "📡",
+      "featured": false,
+      "highlights": [
+        { "label": "Chain", "value": "ESP32 → RFID → MQTT → AI" },
+        { "label": "Award", "value": "UEC Tokyo 2026" }
+      ]
+    },
+    {
+      "id": "banjirkawan",
+      "title": "BanjirKawan",
+      "tagline": "A TypeScript build from July 2026.",
+      "description": "TypeScript project. Open the CMS at /admin to write its full story.",
+      "status": "archived",
+      "year": "2026",
+      "tags": ["Web"],
+      "stack": ["typescript"],
+      "repo": "jhjh1214/BanjirKawan",
+      "url": "",
+      "colorA": "#0284c7",
+      "colorB": "#0c4a6e",
+      "emoji": "🌊",
+      "featured": false,
+      "highlights": []
+    },
+    {
+      "id": "proton-ecu-toolkit",
+      "title": "Proton ECU Toolkit",
+      "tagline": "Java tooling for automotive ECU work.",
+      "description": "A Java toolkit for working with Proton vehicle ECUs. Open the CMS at /admin to expand this description.",
+      "status": "archived",
+      "year": "2026",
+      "tags": ["Automotive", "Tooling"],
+      "stack": ["java"],
+      "repo": "jhjh1214/proton-ecu-toolkit",
+      "url": "",
+      "colorA": "#f59e0b",
+      "colorB": "#78350f",
+      "emoji": "🚗",
+      "featured": false,
+      "highlights": []
+    },
+    {
+      "id": "slop-simulator",
+      "title": "Slop Simulator",
+      "tagline": "Roblox collector / simulator built with Rojo.",
+      "description": "A Roblox collector/simulator written in Luau and synced with Rojo.",
+      "status": "wip",
+      "year": "2026",
+      "tags": ["Game"],
+      "stack": ["🎮"],
+      "repo": "",
+      "url": "",
+      "colorA": "#22c55e",
+      "colorB": "#052e16",
+      "emoji": "🎮",
+      "featured": false,
+      "highlights": [{ "label": "Language", "value": "Luau" }]
+    },
+    {
+      "id": "tictactoe-c",
+      "title": "TTP6313 Tic-Tac-Toe",
+      "tagline": "Down to the metal, in C.",
+      "description": "A university-course Tic-Tac-Toe in C. Its unbeatable big sibling lives in the Arcade below.",
+      "status": "archived",
+      "year": "2026",
+      "tags": ["University", "C"],
+      "stack": ["c"],
+      "repo": "jhjh1214/ttp6313-tictactoe",
+      "url": "",
+      "colorA": "#64748b",
+      "colorB": "#0f172a",
+      "emoji": "⭕",
+      "featured": false,
+      "highlights": []
+    },
+    {
+      "id": "face-recognition-api",
+      "title": "Face Recognition API",
+      "tagline": "A Java face-recognition service.",
+      "description": "Java face recognition API, built October 2025.",
+      "status": "archived",
+      "year": "2025",
+      "tags": ["AI", "Backend"],
+      "stack": ["java", "spring"],
+      "repo": "jhjh1214/face-recognition-api",
+      "url": "",
+      "colorA": "#ec4899",
+      "colorB": "#500724",
+      "emoji": "🙂",
+      "featured": false,
+      "highlights": []
+    },
+    {
+      "id": "angular-era",
+      "title": "The Angular Arc",
+      "tagline": "Hotel, appointment and book apps. Where it began.",
+      "description": "The first real builds from July 2025: an Angular hotel appointment app, a book management system, an appointment app and a food-ordering tutorial project. Followed by the Angsaku landing page.",
+      "status": "archived",
+      "year": "2025",
+      "tags": ["Web", "Origin story"],
+      "stack": ["angular", "typescript", "sass"],
+      "repo": "",
+      "url": "",
+      "colorA": "#dd0031",
+      "colorB": "#3b0713",
+      "emoji": "🅰️",
+      "featured": false,
+      "highlights": [{ "label": "Started", "value": "Jul 2025" }]
+    }
+  ],
+  "journey": [
+    { "id": "j1", "date": "Jul 2025", "title": "Player One joins", "detail": "First commits: an Angular food-ordering tutorial, then hotel, appointment and book-management apps.", "kind": "start", "icon": "🌱" },
+    { "id": "j2", "date": "Oct 2025", "title": "Out into the world", "detail": "Shipped the Angsaku landing page and a Java face-recognition API.", "kind": "project", "icon": "🚀" },
+    { "id": "j3", "date": "Feb 2026", "title": "Down to the metal", "detail": "TTP6313 course work in C, including a Tic-Tac-Toe.", "kind": "milestone", "icon": "🔩" },
+    { "id": "j4", "date": "May 2026", "title": "VehicleChain begins", "detail": "Started the blockchain vehicle service platform: 3 smart contracts, 702 tests and 38 security vectors later, it went on to win.", "kind": "project", "icon": "⛓️" },
+    { "id": "j5", "date": "Jun 2026", "title": "Proton ECU Toolkit", "detail": "Java tooling for automotive ECU work.", "kind": "project", "icon": "🚗" },
+    { "id": "j6", "date": "Jul 2026", "title": "BanjirKawan", "detail": "A new TypeScript build.", "kind": "project", "icon": "🌊" },
+    { "id": "j7", "date": "2026", "title": "PRISM 2026: Gold and 2nd Runner Up", "detail": "VehicleChain took a Gold Award and 2nd Runner Up at PRISM 2026.", "kind": "award", "icon": "🏆" },
+    { "id": "j8", "date": "2026", "title": "Open source merged", "detail": "PayloadCMS contribution merged. Fastify approved. Click contributed.", "kind": "oss", "icon": "🔀" },
+    { "id": "j9", "date": "Sep 2026", "title": "A real client", "detail": "MilanSoftware: a quotation platform for MilanDecor, running real business workflows.", "kind": "milestone", "icon": "🛋️" },
+    { "id": "j10", "date": "2026", "title": "Tokyo", "detail": "Youth Researcher Encouragement Award at the 8th UEC ASEAN Seminar & Workshop. The only undergraduate recipient.", "kind": "award", "icon": "🗼" }
+  ],
+  "achievements": [
+    { "id": "uec", "title": "Youth Researcher Encouragement Award", "description": "8th UEC ASEAN Seminar & Workshop 2026, UEC Tokyo, Japan. The only undergraduate recipient among participating Master's and Doctoral students. For: AI-driven and LLM-based assistant smart inventory management system with RFID and IoT.", "icon": "🗼", "rarity": "legendary", "date": "2026", "issuer": "UEC Tokyo", "featured": true },
+    { "id": "prism-gold", "title": "PRISM 2026 Gold Award", "description": "Gold Award for VehicleChain, the blockchain vehicle service platform.", "icon": "🥇", "rarity": "epic", "date": "2026", "issuer": "PRISM 2026", "featured": false },
+    { "id": "prism-2nd", "title": "PRISM 2026 · 2nd Runner Up", "description": "Second Runner Up for VehicleChain at PRISM 2026.", "icon": "🏅", "rarity": "epic", "date": "2026", "issuer": "PRISM 2026", "featured": false },
+    { "id": "real-client", "title": "Real Client", "description": "Building a live quotation platform for MilanDecor, a working Malaysian retailer.", "icon": "🤝", "rarity": "rare", "date": "2026", "issuer": "MilanDecor", "featured": false },
+    { "id": "tests", "title": "702 Green Tests", "description": "702 automated tests and 38 security vectors on VehicleChain.", "icon": "🧪", "rarity": "rare", "date": "2026", "issuer": "VehicleChain", "featured": false },
+    { "id": "slither", "title": "Zero Slither", "description": "0 High/Critical Slither findings across 3 smart contracts.", "icon": "🐍", "rarity": "rare", "date": "2026", "issuer": "VehicleChain", "featured": false },
+    { "id": "payload", "title": "PayloadCMS Merged", "description": "A contribution merged into Payload, the open-source Next.js framework.", "icon": "🔀", "rarity": "rare", "date": "2026", "issuer": "Payload", "featured": false },
+    { "id": "fastify", "title": "Fastify Approved", "description": "A contribution approved in Fastify, the fast Node.js web framework.", "icon": "⚡", "rarity": "uncommon", "date": "2026", "issuer": "Fastify", "featured": false },
+    { "id": "click", "title": "Click Contributor", "description": "Contributed to Click, the Python CLI toolkit.", "icon": "🖱️", "rarity": "uncommon", "date": "2026", "issuer": "Click", "featured": false }
+  ],
+  "openSource": [
+    { "id": "os1", "name": "Payload", "repo": "payloadcms/payload", "status": "MERGED", "description": "Open-source, full-stack Next.js framework and headless CMS.", "url": "https://github.com/payloadcms/payload" },
+    { "id": "os2", "name": "Fastify", "repo": "fastify/fastify", "status": "APPROVED", "description": "Fast and low overhead web framework for Node.js.", "url": "https://github.com/fastify/fastify" },
+    { "id": "os3", "name": "Click", "repo": "pallets/click", "status": "CONTRIBUTED", "description": "Python composable command line interface toolkit.", "url": "https://github.com/pallets/click" }
+  ],
+  "skills": [
+    { "id": "lang", "title": "Languages", "skills": [
+      { "name": "Python", "icon": "python", "level": 90 },
+      { "name": "TypeScript", "icon": "typescript", "level": 85 },
+      { "name": "Java", "icon": "java", "level": 75 },
+      { "name": "JavaScript", "icon": "javascript", "level": 85 },
+      { "name": "Dart", "icon": "dart", "level": 75 },
+      { "name": "Solidity", "icon": "solidity", "level": 70 }
+    ] },
+    { "id": "fw", "title": "Frameworks", "skills": [
+      { "name": "Flask", "icon": "flask", "level": 85 },
+      { "name": "FastAPI", "icon": "fastapi", "level": 80 },
+      { "name": "Node.js", "icon": "nodejs", "level": 80 },
+      { "name": "Spring", "icon": "spring", "level": 65 },
+      { "name": "Angular", "icon": "angular", "level": 80 },
+      { "name": "React", "icon": "react", "level": 80 },
+      { "name": "Flutter", "icon": "flutter", "level": 80 }
+    ] },
+    { "id": "infra", "title": "Data & Infra", "skills": [
+      { "name": "PostgreSQL", "icon": "postgres", "level": 80 },
+      { "name": "SQLite", "icon": "sqlite", "level": 80 },
+      { "name": "MongoDB", "icon": "mongodb", "level": 65 },
+      { "name": "Firebase", "icon": "firebase", "level": 70 },
+      { "name": "Docker", "icon": "docker", "level": 75 },
+      { "name": "Linux", "icon": "linux", "level": 75 },
+      { "name": "Git", "icon": "git", "level": 90 }
+    ] },
+    { "id": "hw", "title": "Hardware & AI", "skills": [
+      { "name": "ESP32", "icon": "📟", "level": 80 },
+      { "name": "RFID (MFRC522)", "icon": "📡", "level": 80 },
+      { "name": "AI / LLM", "icon": "🤖", "level": 75 },
+      { "name": "RAG", "icon": "🧠", "level": 70 },
+      { "name": "REST APIs", "icon": "🔌", "level": 90 }
+    ] }
+  ],
+  "albums": [
+    { "id": "al-tokyo", "title": "UEC Tokyo 2026", "date": "2026", "location": "Tokyo, Japan", "description": "8th UEC ASEAN Seminar & Workshop.", "emoji": "🗼", "photos": [
+      { "src": "", "caption": "Arrival in Tokyo" },
+      { "src": "", "caption": "Presenting the smart inventory system" },
+      { "src": "", "caption": "The award moment" },
+      { "src": "", "caption": "Campus walk" }
+    ] },
+    { "id": "al-prism", "title": "PRISM 2026", "date": "2026", "location": "Malaysia", "description": "Gold Award and 2nd Runner Up.", "emoji": "🏆", "photos": [
+      { "src": "", "caption": "Demo day" },
+      { "src": "", "caption": "Gold" },
+      { "src": "", "caption": "Team" }
+    ] },
+    { "id": "al-life", "title": "Off the Clock", "date": "Always", "location": "Malacca", "description": "Life outside the terminal.", "emoji": "🌴", "photos": [
+      { "src": "", "caption": "Malacca golden hour" },
+      { "src": "", "caption": "Food, obviously" }
+    ] }
+  ],
+  "eggs": [
+    { "id": "konami", "title": "30 Extra Lives", "description": "You know the code.", "hint": "A classic cheat code from 1986.", "icon": "🎮", "rarity": "epic", "xp": 150 },
+    { "id": "avatar7", "title": "Table Flipper", "description": "Poked the avatar until it rage-quit.", "hint": "Some avatars just can't take a hint.", "icon": "(╯°□°）╯", "rarity": "rare", "xp": 100 },
+    { "id": "terminal", "title": "Hello, World", "description": "Opened the developer console.", "hint": "Tilde. Backtick. That key.", "icon": "⌨️", "rarity": "common", "xp": 40 },
+    { "id": "hire", "title": "sudo hire-me", "description": "Ran the only command that matters.", "hint": "The console knows how to ask nicely.", "icon": "💼", "rarity": "epic", "xp": 150 },
+    { "id": "bugs", "title": "Exterminator", "description": "Found every hidden bug on the page.", "hint": "They're hiding in plain sight.", "icon": "🐛", "rarity": "legendary", "xp": 300 },
+    { "id": "flood", "title": "Banjir!", "description": "Summoned the flood.", "hint": "Type the name of a certain project.", "icon": "🌊", "rarity": "rare", "xp": 100 },
+    { "id": "night", "title": "Night Owl", "description": "Visited between midnight and 5am.", "hint": "Visit when sensible people sleep.", "icon": "🦉", "rarity": "uncommon", "xp": 60 },
+    { "id": "chip", "title": "It's Alive", "description": "Booted the ESP32.", "hint": "Something in the 3D scene has a tiny LED.", "icon": "💡", "rarity": "uncommon", "xp": 60 },
+    { "id": "stalemate", "title": "Stalemate", "description": "Drew against the unbeatable Tic-Tac-Toe AI.", "hint": "You can't win. Can you not lose?", "icon": "🤝", "rarity": "rare", "xp": 100 },
+    { "id": "arcade", "title": "Arcade Regular", "description": "Played all four arcade games.", "hint": "Visit every cabinet.", "icon": "🕹️", "rarity": "uncommon", "xp": 80 },
+    { "id": "explorer", "title": "Completionist", "description": "Scrolled through every section.", "hint": "Read the whole page.", "icon": "🧭", "rarity": "common", "xp": 50 },
+    { "id": "lost", "title": "Lost in the Mempool", "description": "Found the 404 page.", "hint": "Take a wrong turn.", "icon": "🧩", "rarity": "uncommon", "xp": 60 },
+    { "id": "grass", "title": "Touch Grass", "description": "Idled at the bottom of the page.", "hint": "Sometimes the answer is to stop.", "icon": "🌱", "rarity": "uncommon", "xp": 60 },
+    { "id": "boss", "title": "Behind the Curtain", "description": "Found the CMS.", "hint": "Every site has a backstage.", "icon": "🔒", "rarity": "rare", "xp": 100 },
+    { "id": "shipit", "title": "Ship It", "description": "Typed the motto.", "hint": "Build. Verify. …", "icon": "🚢", "rarity": "uncommon", "xp": 60 }
+  ],
+  "site": {
+    "githubUser": "jhjh1214",
+    "publishRepo": "jhjh1214/portfolio",
+    "publishBranch": "main",
+    "publishPath": "src/content/content.json",
+    "bugCount": 8,
+    "arcadeIntro": "Four cabinets. Scores are saved in your browser and earn XP.",
+    "games": ["bugsquash", "tictactoe", "memory", "snake"]
+  }
+}
