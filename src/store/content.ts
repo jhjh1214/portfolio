@@ -7,10 +7,16 @@ const DRAFT_KEY = 'pf.draft'
 const REMOTE_KEY = 'pf.remote'
 export const published = base as unknown as Content
 
+/** Cached or published content only counts if it was written for this version of the content shape. */
+export const isCurrent = (raw: unknown) => !!raw && typeof raw === 'object' && (raw as { version?: unknown }).version === published.version
+
 function read(key: string): Content | null {
   try {
     const raw = localStorage.getItem(key)
-    return raw ? normalizeContent(published, JSON.parse(raw)) : null
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (!isCurrent(parsed)) { localStorage.removeItem(key); return null } // stale: drop it rather than let old arrays override new content
+    return normalizeContent(published, parsed)
   } catch {
     return null
   }
@@ -39,7 +45,7 @@ export const useContent = create<ContentState>((set, get) => ({
   remote: read(REMOTE_KEY),
   draft: read(DRAFT_KEY),
   setRemote: (raw) => {
-    const next = raw ? normalizeContent(published, raw) : null
+    const next = isCurrent(raw) ? normalizeContent(published, raw) : null
     write(REMOTE_KEY, next)
     set({ remote: next })
   },

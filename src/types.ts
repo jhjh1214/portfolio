@@ -2,7 +2,7 @@ export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 export type SectionId = 'showcase' | 'projects' | 'journey' | 'achievements' | 'opensource' | 'skills' | 'album' | 'arcade' | 'contact'
 export type GameId = 'bugsquash' | 'tictactoe' | 'memory' | 'snake'
 export type ProjectStatus = 'live' | 'shipped' | 'wip' | 'archived'
-export type ThemeId = 'nyonya' | 'steam' | 'terminal' | 'sakura' | 'mono'
+export type ThemeId = 'nyonya' | 'cyber' | 'steam' | 'terminal' | 'sakura' | 'mono'
 export type Mode = 'system' | 'light' | 'dark'
 export type Tone = 'teal' | 'coral' | 'sun' | 'cobalt'
 
@@ -16,6 +16,9 @@ export interface Profile {
   bio: string
   avatar: string
   location: string
+  /** Only year and month are stored (and public): enough to show an age without publishing a full birthday. 0 = not set. */
+  birthYear: number
+  birthMonth: number
   status: 'online' | 'away' | 'offline'
   statusText: string
   typing: string[]
@@ -96,6 +99,8 @@ export interface Site {
 }
 
 export interface Content {
+  /** Bump when the content shape changes. Cached or published content from an older version is ignored, not merged. */
+  version: number
   profile: Profile
   theme: ThemeConfig
   sections: SectionConfig[]

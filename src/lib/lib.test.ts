@@ -3,6 +3,8 @@ import { levelFromXp, xpForLevel, levelProgress } from './level'
 import { createSequenceMatcher, KONAMI, word } from './sequence'
 import { bestMove, winner, type Board } from './tictactoe'
 import { normalize } from './normalize'
+import { ageFrom } from './age'
+import { isCurrent, published } from '../store/content'
 import content from '../content/content.json'
 import type { Content } from '../types'
 
@@ -100,5 +102,33 @@ describe('bundled content', () => {
   })
   it('survives normalization against itself unchanged', () => {
     expect(normalize(c, c)).toEqual(c)
+  })
+})
+
+describe('age', () => {
+  it('counts whole years and ticks over in the birth month', () => {
+    expect(ageFrom(2003, 6, new Date(2026, 5, 1))).toBe(23) // June 2026, born June 2003
+    expect(ageFrom(2003, 6, new Date(2026, 4, 31))).toBe(22) // one day earlier
+    expect(ageFrom(2003, 12, new Date(2026, 0, 15))).toBe(22)
+  })
+  it('is null when unset or impossible, never a wrong number', () => {
+    expect(ageFrom(0, 0)).toBeNull()
+    expect(ageFrom(2003, 0)).toBeNull()
+    expect(ageFrom(2003, 13)).toBeNull()
+    expect(ageFrom(2999, 5)).toBeNull()
+  })
+})
+
+describe('content versioning', () => {
+  it('bundled content declares a version', () => {
+    expect((content as unknown as Content).version).toBeGreaterThanOrEqual(2)
+  })
+  it('only accepts cached or published content written for the current version', () => {
+    expect(isCurrent({ ...published })).toBe(true)
+    expect(isCurrent({ ...published, version: published.version - 1 })).toBe(false)
+    expect(isCurrent({ ...published, version: published.version + 1 })).toBe(false)
+    const { version: _v, ...noVersion } = published
+    expect(isCurrent(noVersion)).toBe(false) // content saved before versioning existed
+    for (const junk of [null, undefined, 'x', 3, []]) expect(isCurrent(junk)).toBe(false)
   })
 })
