@@ -6,9 +6,10 @@ The whole thing is one codebase you own: a React front end and a small TypeScrip
 
 ## What's in it
 
-- **Visitors** pick a palette (five, each with light and dark) like choosing a Steam profile background. They can sign in with just an email: a one-time 6-digit code every time, no password. Their XP, achievements, scores and theme then follow them across devices.
+- **Visitors** pick a palette (six, each with light and dark) like choosing a Steam profile background. **Cyberpunk** is the neon one: circuit tiles, a starfield, scanlines, gradient titles, and a boot sequence. They can sign in with just an email: a one-time 6-digit code every time, no password. Their XP, achievements, scores and theme then follow them across devices.
 - **Contact** form with email and an optional WhatsApp number (validated to international format). You get it in the inbox and by email.
 - **Owner CMS** at `/#/admin`: edit every section, upload photos, read the inbox (with email and WhatsApp reply links), see who has signed in, and publish instantly with no redeploy.
+- The profile badge shows **your age** (set birth year and month in the CMS; only those two are stored, and they're public). The **journey timeline** has a bug that crawls down it as you scroll.
 - **Phones** treat each section as a page: swipe or tap the bottom dock and it snaps to the next tab.
 - **Hidden achievements** work on keyboard and touch. `secrets` in the console lists hints; each locked achievement also shows how to find it on a phone.
 - Sound effects are Kenney's CC0 Interface Sounds, played with Howler. See `/#/colophon` for all credits.
@@ -39,7 +40,7 @@ Other commands:
 npm run dev          # front end only (contact and sign-in say "not connected")
 npm run server       # just the API on :8787; with `cross-env VITE_API_URL=same-origin vite` you get hot reload
 npm run typecheck
-npm test             # 64 tests: logic, TOTP against the RFC vectors, and 47 API security tests
+npm test             # logic, TOTP against the RFC vectors, and 47 API security tests
 npm run test:e2e     # real browser, real server, phones and all (needs Chrome; set CHROME_PATH if not default)
 ```
 
@@ -98,13 +99,13 @@ The site is static, so the UI can't be trusted to keep secrets. Every rule is en
 
 ## Content
 
-Everything on the page is data in `src/content/content.json`, which is the fallback and the seed. Once the owner publishes from the CMS, the database copy takes over and visitors see it immediately. Without a backend the CMS runs in local mode: changes stay in your browser, and **Download JSON** gives you a file to commit over `src/content/content.json`.
+Everything on the page is data in `src/content/content.json`, which is the fallback and the seed. It carries a `version`: when you change the *shape* of the content, bump it. Content cached in a browser or published from an older version is then ignored instead of being merged over the new site. Once the owner publishes from the CMS, the database copy takes over and visitors see it immediately. Without a backend the CMS runs in local mode: changes stay in your browser, and **Download JSON** gives you a file to commit over `src/content/content.json`.
 
 ## Layout
 
 ```
 src/content/content.json   default content
-src/theme/                 five palettes x light/dark
+src/theme/                 six palettes x light/dark
 src/sections/  src/games/  page sections and the arcade
 src/components/            nav, dock, dialogs, tile wall, easter eggs, console
 src/admin/                 schema-driven CMS, guard and inbox
@@ -113,7 +114,7 @@ server/src/app.ts          the API (runs on Workers and on Node)
 server/schema.sql          database tables
 server/test/               API + TOTP tests
 wrangler.toml              Cloudflare config
-e2e/                       browser tests
+e2e/                       browser tests, including a layout audit across 14 screen widths and 2 themes
 ```
 
 ## Stack

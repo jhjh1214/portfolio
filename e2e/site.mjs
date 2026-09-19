@@ -4,9 +4,10 @@
 import { chromium } from 'playwright-core'
 import { spawn } from 'node:child_process'
 import { DatabaseSync } from 'node:sqlite'
-import { rmSync } from 'node:fs'
+import { rmSync, readFileSync } from 'node:fs'
 import { TOTP, Secret } from 'otpauth'
 
+const bundled = JSON.parse(readFileSync('src/content/content.json', 'utf8'))
 const PORT = 4180
 const BASE = `http://localhost:${PORT}`
 const CHROME = process.env.CHROME_PATH ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe'
@@ -79,6 +80,116 @@ try {
     const gradients = await page.evaluate(() => [...document.querySelectorAll('*')].filter((e) => /gradient/.test(getComputedStyle(e).backgroundImage) && !e.closest('svg')).length)
     ok('gradients are rare (at most a few)', gradients <= 4, `(${gradients} elements)`)
     ok('the 3D board renders under the CSP', (await page.locator('canvas').count()) >= 1)
+    await ctx.close()
+  }
+
+
+  // ------------------------------------------------------------ layout audit: alignment at every screen size, in two very different themes
+  {
+    const WIDTHS = [360, 390, 430, 600, 768, 820, 1024, 1180, 1280, 1366, 1440, 1680, 1920, 2560]
+    const THEMES = [['nyonya', 'light'], ['cyber', 'dark']]
+    const problems = []
+    for (const [theme, mode] of THEMES) {
+      for (const w of WIDTHS) {
+        const mobile = w < 820
+        const { ctx, page } = await open({ viewport: { width: w, height: 900 }, hasTouch: mobile, isMobile: mobile, colorScheme: mode })
+        await page.addInitScript(([t, m]) => { localStorage.setItem('pf.progress', JSON.stringify({ theme: t, mode: m })); sessionStorage.setItem('pf.boot', '1') }, [theme, mode])
+        await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
+        await page.waitForTimeout(900)
+        const r = await page.evaluate(() => {
+          const out = []
+          const rect = (el) => el.getBoundingClientRect()
+          if (document.documentElement.scrollWidth > innerWidth) out.push(`horizontal overflow ${document.documentElement.scrollWidth - innerWidth}px`)
+          // nav (or dock on small screens) must share the content column's edges
+          const bar = [...document.querySelectorAll('nav')].find((n) => n.getBoundingClientRect().width > 0 && getComputedStyle(n).display !== 'none' && n.className.includes('glass'))
+          const col = document.querySelector('#showcase')
+          if (bar && col) { const a = rect(bar), b = rect(col); if (Math.abs(a.left - b.left) > 1.5 || Math.abs(a.right - b.right) > 1.5) out.push(`nav edges ${Math.round(a.left)}-${Math.round(a.right)} vs content ${Math.round(b.left)}-${Math.round(b.right)}`) }
+          // desktop hero: both columns end together
+          const wrap = document.querySelector('#top .wrap')
+          if (wrap && innerWidth >= 1024) {
+            // the last CARD of each column, not the column wrapper (wrappers are equal by construction and hide voids)
+            const ends = [...wrap.children].map((c) => rect(c.lastElementChild).bottom)
+            if (ends.length === 2 && Math.abs(ends[0] - ends[1]) > 2) out.push(`hero cards end ${Math.round(ends[0])} vs ${Math.round(ends[1])}`)
+          }
+          // nothing readable may be cut off or spill out of its container
+          const skip = (el) => !!el.closest('.marquee-wrap, [aria-label^="Decorative"], [aria-label="Albums"], [role="tablist"], nav, .sr-only, [aria-hidden="true"]')
+          const scrolls = (el) => { for (let a = el.parentElement; a; a = a.parentElement) { const o = getComputedStyle(a).overflowX; if (o === 'auto' || o === 'scroll') return true } return false }
+          for (const el of document.querySelectorAll('main h1, main h2, main h3, main h4, main p, main button, main a, main dt, main dd, main li')) {
+            if (skip(el) || scrolls(el)) continue
+            const b = rect(el)
+            if (b.width === 0 || b.height === 0) continue
+            if (b.left < -1 || b.right > innerWidth + 1) { out.push(`off-screen: "${(el.textContent || '').trim().slice(0, 30)}" ${Math.round(b.left)}..${Math.round(b.right)}`); continue }
+            const host = el.parentElement?.closest('.card, .card-raised')
+            if (host) { const h = rect(host); if (b.right > h.right + 1 || b.left < h.left - 1) out.push(`spills out of its card: "${(el.textContent || '').trim().slice(0, 30)}"`) }
+          }
+          return [...new Set(out)].slice(0, 4)
+        })
+        for (const m of r) problems.push(`${theme} ${w}px: ${m}`)
+        await ctx.close()
+      }
+    }
+    ok(`layout holds at ${WIDTHS.length} widths in 2 themes (no overflow, aligned edges, hero cards end together, nothing clipped)`, problems.length === 0, problems.length ? '\n    ' + problems.slice(0, 14).join('\n    ') : '')
+  }
+
+
+  // ------------------------------------------------------------ age badge, stale cache, cyberpunk theme, journey bug
+  {
+    // Age replaces the level. Only year and month are used.
+    const year = new Date().getFullYear() - 25
+    const draft = { ...bundled, profile: { ...bundled.profile, birthYear: year, birthMonth: 1 } }
+    let { ctx, page } = await open()
+    await page.addInitScript((d) => localStorage.setItem('pf.draft', JSON.stringify(d)), draft)
+    await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
+    ok('the profile badge shows my age, not a level', (await page.getByLabel('Age 25').count()) === 1)
+    ok('and the old level badge is gone', (await page.getByTitle('Profile level').count()) === 0)
+    await ctx.close()
+    ;({ ctx, page } = await open())
+    await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
+    ok('with no birth date set, no badge (never a made-up number)', (await page.getByLabel(/^Age \d+/).count()) === 0)
+    await ctx.close()
+
+    // Regression: content cached by an older version must never override the current site.
+    const stale = { profile: { name: 'Old Name', bio: 'old 🐛' }, sections: [{ id: 'projects', label: 'Library', title: 'Old', subtitle: '', visible: true }], achievements: [{ id: 'x', title: 'Old', description: '', icon: '🏆', rarity: 'rare', date: '', issuer: '', featured: false }] }
+    ;({ ctx, page } = await open())
+    await page.addInitScript((d) => { localStorage.setItem('pf.draft', JSON.stringify(d)); localStorage.setItem('pf.remote', JSON.stringify(d)) }, stale)
+    await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
+    ok('stale cached content is discarded instead of overriding the new site', (await page.locator('h1').innerText()) === 'Lim Jun Hong' && (await page.locator('nav[aria-label="Main"]').innerText()).includes('Games') && !(await page.locator('nav[aria-label="Main"]').innerText()).includes('Library'))
+    ok('and the stale cache is cleared', (await page.evaluate(() => [localStorage.getItem('pf.draft'), localStorage.getItem('pf.remote')].join())) === ',')
+    await ctx.close()
+
+    // Cyberpunk theme: neon layer, starfield, boot sequence (once per session, skippable, never with reduced motion)
+    ;({ ctx, page } = await open({ colorScheme: 'dark' }))
+    await page.addInitScript(() => localStorage.setItem('pf.progress', JSON.stringify({ theme: 'cyber', mode: 'dark' })))
+    await page.goto(`${BASE}/#/`, { waitUntil: 'domcontentloaded' })
+    await page.getByRole('status', { name: /Loading the profile/ }).waitFor({ timeout: 5000 })
+    ok('the Cyberpunk theme opens with a boot sequence', true)
+    await page.keyboard.press('Space')
+    await page.getByRole('status', { name: /Loading the profile/ }).waitFor({ state: 'detached', timeout: 3000 })
+    ok('any key skips the boot sequence', true)
+    ok('the neon effects layer is on (scanlines, glow, gradient titles)', (await page.evaluate(() => [document.documentElement.dataset.theme, document.documentElement.dataset.fx, getComputedStyle(document.querySelector('h1')).backgroundClip].join())) === 'cyber,neon,text')
+    ok('the starfield canvas is running', (await page.locator('canvas.fixed').count()) === 1)
+    ok('the theme swaps the body font to monospace', /JetBrains/.test(await page.evaluate(() => getComputedStyle(document.body).fontFamily)))
+    await page.reload({ waitUntil: 'networkidle' })
+    ok('the boot sequence plays once per session, not on every reload', (await page.getByRole('status', { name: /Loading the profile/ }).count()) === 0)
+    await ctx.close()
+    ;({ ctx, page } = await open({ colorScheme: 'dark', reducedMotion: 'reduce' }))
+    await page.addInitScript(() => localStorage.setItem('pf.progress', JSON.stringify({ theme: 'cyber', mode: 'dark' })))
+    await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
+    ok('reduced motion: no boot sequence and no animated starfield', (await page.getByRole('status', { name: /Loading the profile/ }).count()) === 0 && (await page.locator('canvas.fixed').count()) === 1 && (await page.evaluate(() => getComputedStyle(document.querySelector('.marquee')).animationPlayState)) === 'paused')
+    await ctx.close()
+
+    // The bug crawls down the timeline as you scroll.
+    ;({ ctx, page } = await open())
+    await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
+    const bugY = () => page.evaluate(() => { const r = document.querySelector('#journey ol svg.lucide-bug').getBoundingClientRect(); return Math.round(r.top + scrollY) })
+    await page.evaluate(() => document.getElementById('journey').scrollIntoView({ behavior: 'instant' }))
+    await page.waitForTimeout(1200)
+    const a = await bugY()
+    await page.evaluate(() => scrollBy(0, 900))
+    await page.waitForTimeout(1500)
+    const b2 = await bugY()
+    ok('the bug crawls down the journey timeline as you scroll', b2 > a + 150, `(${a}px -> ${b2}px)`)
+    ok('and lights the stops it has passed', (await page.evaluate(() => [...document.querySelectorAll('#journey ol li > span')].filter((e) => e.style.transform === 'scale(1)').length)) >= 2)
     await ctx.close()
   }
 

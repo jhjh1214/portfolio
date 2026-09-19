@@ -59,15 +59,21 @@ export function Nav() {
 
   return (
     <>
-      <nav className="glass glass-strong glass-refract fixed inset-x-3 top-3 z-50 mx-auto flex h-14 max-w-7xl items-center gap-1 rounded-2xl px-2 md:inset-x-6" aria-label="Main">
+      {/* Same width as every section (.wrap), so the pill's edges line up with the content below it. */}
+      <nav className="glass glass-strong glass-refract wrap fixed inset-x-0 top-3 z-50 flex h-14 items-center gap-1 rounded-2xl px-2" aria-label="Main">
         <a href="#top" onClick={logo} aria-label="Home. Tap five times for a surprise." className="glitch grid h-10 shrink-0 place-items-center rounded-xl px-3 font-display text-xl font-extrabold">LJ<span className="text-accent">.</span></a>
-        <div className="hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto lg:flex" style={{ scrollbarWidth: 'none' }}>
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex">
           {secs.map((s) => (
-            <a key={s.id} href={`#${s.id}`} onClick={(e) => { e.preventDefault(); scrollTo(s.id) }} aria-current={active === s.id ? 'true' : undefined}
-              className={cx('shrink-0 rounded-lg px-3 py-2 text-sm font-semibold transition-colors', active === s.id ? 'bg-ink text-bg' : 'text-muted hover:bg-ink/10 hover:text-ink')}>{s.label}</a>
+            <Tip key={s.id} label={s.label}>
+              <a href={`#${s.id}`} onClick={(e) => { e.preventDefault(); scrollTo(s.id) }} aria-label={s.label} aria-current={active === s.id ? 'true' : undefined}
+                className={cx('flex shrink-0 items-center gap-2 rounded-lg px-2.5 py-2 text-sm font-semibold transition-colors xl:px-3', active === s.id ? 'bg-ink text-bg' : 'text-muted hover:bg-ink/10 hover:text-ink')}>
+                <Icon name={SECTION_ICON[s.id]} size={17} className="xl:hidden" />
+                <span className={cx(active === s.id ? 'inline' : 'hidden', 'xl:inline')}>{s.label}</span>
+              </a>
+            </Tip>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-0.5">
+        <div className="ml-auto flex items-center gap-0.5 lg:ml-0">
           <Tip label="Search and commands (Ctrl K)"><button className="btn btn-ghost btn-icon !min-h-10 !w-10" onClick={() => setPalette(true)} aria-label="Open command menu"><Search size={18} /></button></Tip>
           <Tip label="Profile theme"><button className="btn btn-ghost btn-icon !min-h-10 !w-10" onClick={() => setTheme(true)} aria-label="Choose profile theme"><Palette size={18} /></button></Tip>
           <Tip label={muted ? 'Sound off' : 'Sound on'}><button className="btn btn-ghost btn-icon !min-h-10 !w-10" onClick={toggleMute} aria-label={muted ? 'Turn sound on' : 'Turn sound off'} aria-pressed={!muted}>{muted ? <VolumeX size={18} /> : <Volume2 size={18} />}</button></Tip>
@@ -93,7 +99,7 @@ export function Dock() {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => { ref.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }) }, [active])
   return (
-    <nav className="glass glass-strong glass-refract fixed inset-x-3 bottom-3 z-50 rounded-2xl p-1.5 lg:hidden" aria-label="Sections">
+    <nav className="glass glass-strong glass-refract wrap fixed inset-x-0 bottom-3 z-50 rounded-2xl p-1.5 lg:hidden" aria-label="Sections">
       <div ref={ref} className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
         {items.map((it) => (
           <button key={it.id} aria-current={active === it.id ? 'true' : undefined} aria-label={it.label} onClick={() => scrollTo(it.id)}

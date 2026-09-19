@@ -147,3 +147,80 @@ html.snap main { padding-bottom: 6rem; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   html.snap { scroll-snap-type: none; }
 }
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Layout: ONE width for the nav pill, every section and the footer, so their edges always line up.
+--------------------------------------------------------------------------------------------------------------- */
+:root { --gutter: 1rem; --maxw: 78rem; }
+@media (min-width: 640px) { :root { --gutter: 1.5rem; } }
+.wrap { width: min(100% - 2 * var(--gutter), var(--maxw)); margin-inline: auto; }
+body { position: relative; isolation: isolate; }
+
+/* ---------------------------------------------------------------------------------------------------------------
+   Effects shared by every theme (kept restrained), and the full neon layer for the Cyberpunk theme.
+--------------------------------------------------------------------------------------------------------------- */
+@layer components {
+  .title-fx { color: var(--ink); }
+
+  /* Holographic foil for rare cards. */
+  .holo { position: relative; overflow: hidden; }
+  .holo::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .32; mix-blend-mode: soft-light;
+    background: linear-gradient(115deg, transparent 18%, color-mix(in srgb, var(--accent) 70%, transparent) 38%, color-mix(in srgb, var(--sun) 70%, transparent) 52%, color-mix(in srgb, var(--primary) 60%, transparent) 66%, transparent 82%);
+    background-size: 260% 260%; animation: foil 7s ease-in-out infinite;
+  }
+  :root[data-mode='dark'] .holo::after { mix-blend-mode: color-dodge; opacity: .22; }
+
+  /* Specular glare that follows the pointer on tilted cards. */
+  .glare { position: relative; }
+  .glare::before {
+    content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; border-radius: inherit; opacity: var(--glare, 0); transition: opacity .25s;
+    background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / .34), transparent 55%);
+  }
+
+  .marquee { display: flex; width: max-content; animation: marquee var(--dur, 46s) linear infinite; }
+  .marquee.reverse { animation-direction: reverse; }
+  .marquee-wrap:hover .marquee { animation-play-state: paused; }
+
+  .cursor-glow {
+    position: fixed; inset: 0; z-index: 45; pointer-events: none; mix-blend-mode: soft-light; opacity: var(--cg, 0); transition: opacity .3s;
+    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--primary) 55%, #fff), transparent 62%);
+  }
+  :root[data-mode='dark'] .cursor-glow { mix-blend-mode: screen; background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--primary) 26%, transparent), transparent 62%); }
+
+  .legend-ring { position: relative; }
+  .legend-ring::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: 1; padding: 2px; pointer-events: none;
+    background: conic-gradient(from var(--spin, 0deg), var(--sun), var(--accent), var(--primary), var(--sun));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: spin-var 6s linear infinite;
+  }
+}
+@property --spin { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes spin-var { to { --spin: 360deg; } }
+@keyframes foil { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes marquee { to { transform: translateX(-50%); } }
+@keyframes boot-caret { 50% { opacity: 0; } }
+
+/* Cyberpunk theme (dark): neon borders and glow, gradient titles, scanlines. The starfield is a canvas (AmbientFx). */
+@layer components {
+  html[data-fx='neon'] .card, html[data-fx='neon'] .card-raised {
+    border-color: color-mix(in srgb, var(--primary) 42%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent), 0 14px 44px -24px var(--primary);
+  }
+  html[data-fx='neon'] .lift:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 0 28px -6px var(--accent), inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent); }
+  html[data-fx='neon'] .btn { background: linear-gradient(120deg, var(--primary), var(--accent)); border-color: transparent; box-shadow: 0 0 26px -6px var(--accent), 0 4px 0 color-mix(in srgb, var(--primary) 45%, #000); }
+  html[data-fx='neon'] .btn-soft { background: color-mix(in srgb, var(--surface) 70%, transparent); border: 1.5px solid color-mix(in srgb, var(--primary) 55%, transparent); box-shadow: 0 0 20px -10px var(--primary), 0 4px 0 color-mix(in srgb, var(--primary) 25%, #000); }
+  html[data-fx='neon'] .btn-ghost { background: transparent; box-shadow: none; border-color: transparent; }
+  html[data-fx='neon'] .chip { border-color: color-mix(in srgb, var(--primary) 55%, transparent); }
+  html[data-fx='neon'] .chip-solid { background: linear-gradient(120deg, var(--primary), var(--accent)); border-color: transparent; color: #fff; }
+  html[data-fx='neon'] .field:focus { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent), 0 0 24px -8px var(--accent); border-color: var(--accent); }
+  html[data-fx='neon'] .title-fx {
+    background: linear-gradient(100deg, var(--sun), var(--primary) 50%, var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 18px color-mix(in srgb, var(--primary) 55%, transparent));
+  }
+  html[data-fx='neon'] .sec-icon { box-shadow: 0 0 28px -4px var(--accent), 0 4px 0 var(--ink) !important; }
+  html[data-fx='neon'] body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 60; opacity: .05; background: repeating-linear-gradient(0deg, #fff 0, #fff 1px, transparent 1px, transparent 3px); }
+  html[data-fx='neon'] .glass { border-color: color-mix(in srgb, var(--primary) 45%, transparent); box-shadow: 0 0 34px -12px var(--primary), inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent); }
+  html[data-fx='neon'] ::selection { background: color-mix(in srgb, var(--accent) 60%, transparent); }
+}

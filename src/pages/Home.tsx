@@ -14,6 +14,7 @@ import { AlbumSection } from '../sections/Album'
 import { Arcade } from '../sections/Arcade'
 import { Footer } from '../sections/Footer'
 import { useMediaQuery } from '../components/kit'
+import { Ticker } from '../components/fx'
 
 // The form pulls in validation and phone-number libraries, so it loads on demand.
 const Contact = lazy(() => import('../sections/Contact'))
@@ -47,6 +48,7 @@ export default function Home({ preview = false }: { preview?: boolean }) {
       {!preview && <Nav />}
       <main id="main">
         <Hero />
+        <Ticker />
         {visible.map((s, i) => (
           <SectionShell key={s.id} cfg={s} index={i}>{BODY[s.id]()}</SectionShell>
         ))}

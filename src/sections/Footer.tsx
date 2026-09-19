@@ -23,13 +23,13 @@ export function Footer() {
   }
 
   return (
-    <footer className="snap-page relative mt-4 flex flex-col justify-end overflow-hidden border-t-[1.5px] border-line bg-ink px-4 pb-28 pt-16 text-bg md:pb-12">
+    <footer className="snap-page relative mt-4 flex flex-col justify-end overflow-hidden border-t-[1.5px] border-line bg-ink pb-28 pt-16 text-bg md:pb-12">
       <HiddenBug id="b6" className="left-6 top-4" />
       <HiddenBug id="b7" className="bottom-28 right-1/4" />
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="wrap">
         <p className="font-display flex flex-wrap gap-x-4 text-[2.6rem] font-extrabold leading-none sm:text-7xl">
           {MOTTO.map((w, i) => (
-            <button key={w} onClick={() => tapWord(i)} className="rounded-lg px-1 transition-transform hover:-translate-y-1 active:translate-y-0.5">{w}{i < MOTTO.length - 1 ? '.' : '.'}</button>
+            <button key={w} onClick={() => tapWord(i)} className="rounded-lg px-1 transition-transform hover:-translate-y-1 active:translate-y-0.5">{w}.</button>
           ))}
         </p>
         <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">

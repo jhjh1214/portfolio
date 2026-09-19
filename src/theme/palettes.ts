@@ -17,6 +17,10 @@ export interface ThemeDef {
   id: ThemeId
   name: string
   blurb: string
+  /** Turns on the neon effect layer (glow, scanlines, starfield) in dark mode. */
+  fx?: 'neon'
+  /** Body font: 'mono' swaps the text face for the monospace one. */
+  font?: 'mono'
   light: Palette
   dark: Palette
 }
@@ -31,6 +35,15 @@ export const THEMES: ThemeDef[] = [
     blurb: 'Glazed teal, coral and sun-yellow from Malacca shophouse tiles.',
     light: { bg: '#E7F1ED', surface: '#FFFFFF', raised: '#F3F9F6', line: '#C5DBD3', ink: '#0F2E2D', muted: '#4A6764', primary: '#0A7C74', onPrimary: '#FFFFFF', accent: '#E8465C', sun: '#E9A81F', ...tiles },
     dark: { bg: '#0B1E22', surface: '#112A30', raised: '#17363D', line: '#26494F', ink: '#E6F3F0', muted: '#93B5B0', primary: '#35C9B8', onPrimary: '#06201D', accent: '#FF7C8E', sun: '#F7C75A', cobalt: '#6F8BFF' },
+  },
+  {
+    id: 'cyber',
+    name: 'Cyberpunk',
+    blurb: 'Neon on deep navy, scanlines and a starfield. The original look.',
+    fx: 'neon',
+    font: 'mono',
+    light: { bg: '#eceeff', surface: '#ffffff', raised: '#f5f3ff', line: '#cfd2f5', ink: '#0b1026', muted: '#505a86', primary: '#6d28d9', onPrimary: '#ffffff', accent: '#be185d', sun: '#0e7490', cobalt: '#4338ca' },
+    dark: { bg: '#050816', surface: '#0b1026', raised: '#111a3a', line: '#2a3266', ink: '#e2e8f0', muted: '#9aa8c7', primary: '#8b5cf6', onPrimary: '#ffffff', accent: '#ec4899', sun: '#67e8f9', cobalt: '#818cf8' },
   },
   {
     id: 'steam',
@@ -74,8 +87,12 @@ export function applyTheme(id: ThemeId, mode: Mode) {
   const p = themeById(id)[resolved]
   const s = document.documentElement.style
   const el = document.documentElement
+  const def = themeById(id)
   el.dataset.theme = id
   el.dataset.mode = resolved
+  if (def.fx && resolved === 'dark') el.dataset.fx = def.fx
+  else delete el.dataset.fx
+  s.setProperty('--font-body', def.font === 'mono' ? "'JetBrains Mono', ui-monospace, monospace" : "'Instrument Sans Variable', system-ui, sans-serif")
   el.style.colorScheme = resolved
   s.setProperty('--bg', p.bg)
   s.setProperty('--surface', p.surface)

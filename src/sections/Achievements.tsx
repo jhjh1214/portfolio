@@ -18,7 +18,7 @@ export function Achievements() {
         <h3 className="mb-4 text-2xl font-bold">Earned <span className="text-muted">({c.achievements.length})</span></h3>
         <ul className="grid gap-4 md:grid-cols-2">
           {c.achievements.map((a) => (
-            <li key={a.id} className="card flex gap-4 p-4" style={{ borderLeft: `6px solid ${RARITY_COLOR[a.rarity]}` }}>
+            <li key={a.id} className={`card flex gap-4 p-4 ${a.rarity === 'legendary' ? 'holo legend-ring' : a.rarity === 'epic' ? 'holo' : ''}`} style={{ borderLeft: `6px solid ${RARITY_COLOR[a.rarity]}` }}>
               <span className="grid h-16 w-16 shrink-0 place-items-center rounded-xl border-[1.5px] bg-raised" style={{ borderColor: RARITY_COLOR[a.rarity] }}><Icon name={a.icon} size={30} /></span>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2"><h4 className="font-display text-lg font-bold leading-tight">{a.title}</h4><RarityChip rarity={a.rarity} /></div>

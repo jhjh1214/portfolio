@@ -4,6 +4,7 @@ import { CountUp, RarityChip } from '../components/kit'
 import { Icon, TechIcon } from '../lib/icons'
 import { TONE_VAR } from '../lib/utils'
 import { TilePattern } from '../components/TileWall'
+import { Tilt } from '../components/fx'
 
 export function Showcase() {
   const c = useC()
@@ -12,7 +13,8 @@ export function Showcase() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {award && (
-        <article className="relative flex flex-col overflow-hidden rounded-[22px] border-[1.5px] border-ink bg-sun p-7 text-[#1b1b1b] shadow-[0_6px_0_var(--ink)] sm:p-9">
+      <Tilt radius="rounded-[22px]" max={4}>
+        <article className="holo relative flex h-full flex-col overflow-hidden rounded-[22px] border-[1.5px] border-ink bg-sun p-7 text-[#1b1b1b] shadow-[0_6px_0_var(--ink)] sm:p-9">
           <svg className="absolute -right-10 -top-10 h-64 w-64 opacity-20" viewBox="0 0 48 48" aria-hidden>
             <rect x="8" y="8" width="32" height="32" fill="#1b1b1b" /><rect x="8" y="8" width="32" height="32" fill="#1b1b1b" transform="rotate(45 24 24)" />
           </svg>
@@ -26,9 +28,11 @@ export function Showcase() {
             </div>
           </div>
         </article>
+      </Tilt>
       )}
       {proj && (
-        <article className="card relative flex flex-col overflow-hidden">
+        <Tilt radius="rounded-[18px]" max={4}>
+        <article className="card relative flex h-full flex-col overflow-hidden">
           <div className="relative h-40 overflow-hidden"><TilePattern tone={TONE_VAR[proj.tone]} kind={2} />
             <span className="absolute bottom-4 left-5 grid h-14 w-14 place-items-center rounded-xl border-[1.5px] border-ink bg-surface text-ink"><Icon name={proj.icon} size={28} /></span>
           </div>
@@ -47,6 +51,7 @@ export function Showcase() {
             {proj.repo && <a className="btn mt-auto w-fit" style={{ marginTop: '1.5rem' }} href={`https://github.com/${proj.repo}`} target="_blank" rel="noreferrer">View the source <ArrowUpRight size={18} aria-hidden /></a>}
           </div>
         </article>
+        </Tilt>
       )}
     </div>
   )

@@ -18,6 +18,8 @@ export const profileSchema: Schema = [
   S('name', 'Name'), S('handle', 'GitHub handle'), S('tagline', 'Tagline'), T('bio', 'Bio'),
   { key: 'avatar', label: 'Avatar', type: 'image', help: 'URL or upload. Defaults to your GitHub avatar.' },
   S('location', 'Location'),
+  { key: 'birthYear', label: 'Birth year', type: 'number', help: 'Shows your age in the profile badge. Only year and month are stored, and both are public. 0 hides the badge.' },
+  { key: 'birthMonth', label: 'Birth month (1-12)', type: 'number' },
   { key: 'status', label: 'Status', type: 'select', options: ['online', 'away', 'offline'] },
   S('statusText', 'Status text'),
   { key: 'typing', label: 'Typewriter lines', type: 'lines', help: 'One per line.' },

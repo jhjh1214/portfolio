@@ -6,6 +6,7 @@ import { useProgress } from '../store/progress'
 import { useFx } from '../store/fx'
 import { Modal, HiddenBug } from '../components/kit'
 import { TilePattern } from '../components/TileWall'
+import { Tilt } from '../components/fx'
 import { Icon, TechIcon } from '../lib/icons'
 import { fetchRepos, type GhRepo } from '../lib/github'
 import { cx, TONE_VAR } from '../lib/utils'
@@ -75,6 +76,7 @@ export function Projects() {
         <AnimatePresence mode="popLayout">
           {shown.map((p) => (
             <motion.li key={p.id} layout initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.2 }}>
+              <Tilt max={5}>
               <button
                 onClick={() => { if (longPressed.current) { longPressed.current = false; return } play('select'); setOpen(p.id) }}
                 onPointerDown={() => startPress(p)} onPointerUp={endPress} onPointerLeave={endPress} onPointerCancel={endPress}
@@ -89,6 +91,7 @@ export function Projects() {
                   <div className="mt-3 flex min-h-6 flex-wrap gap-2.5 text-muted">{p.stack.slice(0, 6).map((s) => <TechIcon key={s} name={s} size={20} />)}</div>
                 </div>
               </button>
+              </Tilt>
             </motion.li>
           ))}
         </AnimatePresence>
