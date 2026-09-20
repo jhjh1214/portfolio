@@ -23,7 +23,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="snap-page relative mt-4 flex flex-col justify-end overflow-hidden border-t-[1.5px] border-line bg-ink pb-28 pt-16 text-bg md:pb-12">
+    <footer className="relative mt-4 flex flex-col justify-end overflow-hidden border-t-[1.5px] border-line bg-ink pb-28 pt-16 text-bg md:pb-12">
       <HiddenBug id="b6" className="left-6 top-4" />
       <HiddenBug id="b7" className="bottom-28 right-1/4" />
       <div className="wrap">

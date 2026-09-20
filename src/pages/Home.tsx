@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, type ReactNode } from 'react'
+import { lazy, Suspense, type ReactNode } from 'react'
 import { useC } from '../store/content'
 import type { SectionId } from '../types'
 import { Nav, Dock } from '../components/Nav'
@@ -13,7 +13,6 @@ import { Skills } from '../sections/Skills'
 import { AlbumSection } from '../sections/Album'
 import { Arcade } from '../sections/Arcade'
 import { Footer } from '../sections/Footer'
-import { useMediaQuery } from '../components/kit'
 import { Ticker } from '../components/fx'
 
 // The form pulls in validation and phone-number libraries, so it loads on demand.
@@ -34,14 +33,6 @@ const BODY: Record<SectionId, () => ReactNode> = {
 export default function Home({ preview = false }: { preview?: boolean }) {
   const c = useC()
   const visible = c.sections.filter((s) => s.visible && BODY[s.id])
-  const paged = useMediaQuery('(max-width: 1023px)')
-
-  // On phones and tablets each section is a page: swiping snaps to the next tab.
-  useEffect(() => {
-    if (!paged || preview) return
-    document.documentElement.classList.add('snap')
-    return () => document.documentElement.classList.remove('snap')
-  }, [paged, preview])
 
   return (
     <>

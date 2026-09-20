@@ -205,6 +205,8 @@ try {
     await page.waitForTimeout(600) // body colour transitions over 300ms
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor)
     ok('theme actually changes the page colours', bg === 'rgb(29, 15, 21)', bg)
+    const sb = await page.evaluate(() => getComputedStyle(document.documentElement).scrollbarColor)
+    ok('the scrollbar is themed with the active palette, not the browser default', sb === 'rgb(79, 44, 61) rgb(42, 21, 32)', sb)
     await page.keyboard.press('Escape')
     await page.reload({ waitUntil: 'networkidle' })
     ok('theme choice survives a reload', (await page.evaluate(() => document.documentElement.dataset.theme)) === 'sakura')
@@ -339,7 +341,7 @@ try {
     page.on('response', (r) => { if (/\/sfx\/.*\.wav/.test(r.url())) wavs.push(r.status()) })
     await page.goto(`${BASE}/#/`, { waitUntil: 'networkidle' })
     await page.waitForTimeout(1500)
-    ok('sections snap like pages on phones', await page.evaluate(() => document.documentElement.classList.contains('snap') && getComputedStyle(document.documentElement).scrollSnapType.includes('mandatory')))
+    ok('sections scroll freely on phones, no forced per-section snap', await page.evaluate(() => !document.documentElement.classList.contains('snap') && getComputedStyle(document.documentElement).scrollSnapType === 'none'))
     ok('a bottom dock lists the tabs', (await page.getByRole('navigation', { name: 'Sections' }).getByRole('button').count()) >= 8)
     await page.getByRole('navigation', { name: 'Sections' }).getByRole('button', { name: 'Games' }).click()
     await page.waitForTimeout(1200)

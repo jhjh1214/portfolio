@@ -73,7 +73,7 @@ export function Hero() {
   }
 
   return (
-    <header id="top" className="snap-page relative">
+    <header id="top" className="relative">
       <TileWall rows={desktop ? 4 : 3} />
 
       <div className="wrap relative z-10 -mt-16 grid items-stretch gap-5 pb-16 lg:-mt-20 lg:grid-cols-[minmax(0,1fr)_22rem]">

@@ -100,7 +100,7 @@ export function Dock() {
   useEffect(() => { ref.current?.querySelector('[aria-current="true"]')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }) }, [active])
   return (
     <nav className="glass glass-strong glass-refract wrap fixed inset-x-0 bottom-3 z-50 rounded-2xl p-1.5 lg:hidden" aria-label="Sections">
-      <div ref={ref} className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+      <div ref={ref} className="no-scrollbar flex gap-1 overflow-x-auto">
         {items.map((it) => (
           <button key={it.id} aria-current={active === it.id ? 'true' : undefined} aria-label={it.label} onClick={() => scrollTo(it.id)}
             className={cx('flex min-h-11 shrink-0 items-center gap-2 rounded-xl px-3 text-sm font-semibold transition-all', active === it.id ? 'bg-ink text-bg' : 'text-muted')}>

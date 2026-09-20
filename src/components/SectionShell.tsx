@@ -18,7 +18,7 @@ export function SectionShell({ cfg, index, children }: { cfg: SectionConfig; ind
   useEffect(() => { if (seen) markSeen(cfg.id) }, [seen, cfg.id, markSeen])
 
   return (
-    <section ref={ref} id={cfg.id} aria-labelledby={`${cfg.id}-title`} className="snap-page wrap relative py-16 md:py-24">
+    <section ref={ref} id={cfg.id} aria-labelledby={`${cfg.id}-title`} className="wrap relative py-16 md:py-24">
       <header className="mb-8 flex items-start gap-4 md:mb-12">
         <motion.span
           initial={{ scale: 0.7, rotate: -12 }} whileInView={{ scale: 1, rotate: 0 }} viewport={{ once: true, amount: 0.8 }} transition={{ type: 'spring', stiffness: 380, damping: 16 }}

@@ -38,7 +38,14 @@
   --font-mono: var(--font-mono);
 }
 
-html { scroll-behavior: smooth; scroll-padding-top: 5rem; background: var(--bg); }
+html { scroll-behavior: smooth; scroll-padding-top: 5rem; background: var(--bg); scrollbar-color: var(--line) var(--surface); scrollbar-width: thin; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 999px; border: 2px solid var(--surface); background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+::-webkit-scrollbar-corner { background: var(--surface); }
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
 body {
   margin: 0;
   background: var(--bg);
@@ -138,14 +145,8 @@ button { cursor: pointer; }
 .bug-hidden:hover, .bug-hidden:focus-visible { opacity: 1; transform: scale(1.35); }
 .cursor::after { content: ''; display: inline-block; width: .55ch; height: 1.05em; margin-left: 2px; vertical-align: -.15em; background: var(--primary); animation: blink 1s steps(1) infinite; }
 
-/* Phones and tablets: sections behave like pages. One swipe moves to the next tab. */
-html.snap { scroll-snap-type: y mandatory; }
-html.snap .snap-page { scroll-snap-align: start; scroll-snap-stop: always; min-height: 100svh; }
-html.snap main { padding-bottom: 6rem; }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-  html.snap { scroll-snap-type: none; }
 }
 
 /* ---------------------------------------------------------------------------------------------------------------

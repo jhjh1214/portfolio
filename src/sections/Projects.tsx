@@ -65,7 +65,7 @@ export function Projects() {
           <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" aria-hidden />
           <input className="field !w-56 !pl-9" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search the library" />
         </label>
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0" role="group" aria-label="Filter by tag" style={{ scrollbarWidth: "none" }}>
+        <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0" role="group" aria-label="Filter by tag">
           {tags.map((t) => (
             <button key={t} aria-pressed={tag === t} onClick={() => { setTag(t); play('tick') }} className={cx('chip !min-h-9 shrink-0 !px-3 !text-sm transition-colors', tag === t && 'chip-solid')}>{t}</button>
           ))}
