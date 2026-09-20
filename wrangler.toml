@@ -15,7 +15,7 @@ run_worker_first = ["/api/*"]
 binding = "DB"
 database_name = "portfolio"
 # Replace with the id printed by: npx wrangler d1 create portfolio
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "9c58a262-601a-483a-9581-e43840236b72"
 
 [vars]
 # Browser origins allowed to call the API cross-site, for example a GitHub Pages copy of the site.
