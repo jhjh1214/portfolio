@@ -8,7 +8,6 @@ import { Toaster } from './components/Toaster'
 import { Terminal } from './components/Terminal'
 import { Overlays } from './components/Overlays'
 import { EasterEggs } from './components/EasterEggs'
-import { CursorGlow } from './components/fx'
 import { AmbientFx, BootSplash } from './components/Ambient'
 import { ThemePicker } from './components/ThemePicker'
 import { AuthDialog } from './components/AuthDialog'
@@ -58,7 +57,6 @@ function Shell() {
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-bg">Skip to content</a>
       <EasterEggs enabled={live} />
       {live && <AmbientFx />}
-      {live && <CursorGlow />}
       {live && <BootSplash />}
       <Routes>
         <Route path="/" element={<Home preview={preview} />} />

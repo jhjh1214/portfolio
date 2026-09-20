@@ -4,8 +4,6 @@ import { cx, prefersReducedMotion } from '../lib/utils'
 import { hasBrand, TechIcon } from '../lib/icons'
 import { useC } from '../store/content'
 
-const fine = () => typeof matchMedia !== 'undefined' && matchMedia('(pointer: fine)').matches
-
 /** 3D tilt with a specular glare that follows the pointer. Desktop only; a no-op on touch and with reduced motion. */
 export function Tilt({ children, className, radius = 'rounded-[18px]', max = 7 }: { children: ReactNode; className?: string; radius?: string; max?: number }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -75,25 +73,6 @@ export function Magnetic({ children, strength = 0.28 }: { children: ReactNode; s
       {children}
     </motion.div>
   )
-}
-
-/** A soft light that follows the cursor, over everything. Off on touch devices and with reduced motion. */
-export function CursorGlow() {
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    if (!fine() || prefersReducedMotion()) return
-    const el = ref.current!
-    let raf = 0
-    const move = (e: PointerEvent) => {
-      cancelAnimationFrame(raf)
-      raf = requestAnimationFrame(() => { el.style.setProperty('--mx', `${e.clientX}px`); el.style.setProperty('--my', `${e.clientY}px`); el.style.setProperty('--cg', '.75') })
-    }
-    const out = () => el.style.setProperty('--cg', '0')
-    addEventListener('pointermove', move, { passive: true })
-    document.addEventListener('mouseleave', out)
-    return () => { removeEventListener('pointermove', move); document.removeEventListener('mouseleave', out); cancelAnimationFrame(raf) }
-  }, [])
-  return <div ref={ref} className="cursor-glow" aria-hidden />
 }
 
 /** Two counter-scrolling rows: the motto and the tools. Pauses on hover; still with reduced motion. */

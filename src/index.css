@@ -183,12 +183,6 @@ body { position: relative; isolation: isolate; }
   .marquee.reverse { animation-direction: reverse; }
   .marquee-wrap:hover .marquee { animation-play-state: paused; }
 
-  .cursor-glow {
-    position: fixed; inset: 0; z-index: 45; pointer-events: none; mix-blend-mode: soft-light; opacity: var(--cg, 0); transition: opacity .3s;
-    background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--primary) 55%, #fff), transparent 62%);
-  }
-  :root[data-mode='dark'] .cursor-glow { mix-blend-mode: screen; background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--primary) 26%, transparent), transparent 62%); }
-
   .legend-ring { position: relative; }
   .legend-ring::before {
     content: ''; position: absolute; inset: 0; border-radius: inherit; z-index: 1; padding: 2px; pointer-events: none;
