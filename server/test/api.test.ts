@@ -356,6 +356,8 @@ describe('owner: allow-listed email AND second factor', () => {
     expect((await call('/api/owner/messages', { token })).json.messages[0].read_at).not.toBeNull()
     const friends = (await call('/api/owner/friends', { token })).json.friends
     expect(friends.map((f: { displayName: string }) => f.displayName)).toContain('Friendly')
+    expect(friends.map((f: { displayName: string }) => f.displayName)).not.toContain('Owner') // the owner signs in through the same flow but is not their own friend
+    expect((await call('/api/friends/count')).json.count).toBe(1)
     expect((await call(`/api/owner/messages/${list[0].id}`, { token, method: 'DELETE' })).status).toBe(204)
     expect((await call(`/api/owner/messages/${list[0].id}`, { token, method: 'DELETE' })).status).toBe(404)
   })
